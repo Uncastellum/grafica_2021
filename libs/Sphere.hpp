@@ -35,20 +35,28 @@ public:
     }
   }
   VecPun getCenter(){
-      return center;
+    return center;
   }
   VecPun getAxis(){
-      return axis;
+    return axis;
   }
   VecPun getCity(){
-      return city;
+    return city;
   }
   double getRadius(){
-      return axis.modulus() / 2;
+    return axis.modulus() / 2;
   }
-  const double getAzimuth(){
-      double x = city.getxi();
-      double z = city.getzk();
-      return atan(x / -z);
+  double getInclinationRef() const {
+    VecPun ref = city-center;
+    double factor = dotProduct(axis, ref)/(ref.modulus()*axis.modulus());
+    return acos(factor);
+  }
+  double getAzimuthRef() const {
+    VecPun ref = city-center;
+    double factor = crossProduct(axis, ref).modulus()/(ref.modulus()*axis.modulus());
+    return asen(factor);
+    /*double x = city.getxi();
+    double z = city.getzk();
+    return atan(x / -z);*/
   }
 };
