@@ -3,6 +3,7 @@
 #include <iostream>
 #include <exception>
 #include <cmath>
+#include "GeOS.hpp"
 
 //#include "Matrix.hpp"
 
@@ -19,9 +20,9 @@ public:
     axis = VecPun(2,0,0,0);
     city = VecPun(1,0,0,1);
   }
-  Sphere(const VecPun &center_, const VecPun &axis_, const VecPun &city_){
-    double radius = modulus(axis_) / 2;
-    bool correct = fabs(modulus(city_ - center_) - radius) <= 1e-6;
+  Sphere(VecPun &center_, VecPun &axis_, VecPun &city_){
+    double radius = axis_.modulus() / 2;
+    bool correct = fabs((city_ - center_).modulus() - radius) <= 1e-6;
     if (correct)
     {
         center = center_;
@@ -43,7 +44,7 @@ public:
       return city;
   }
   double getRadius(){
-      return axis.mod() / 2;
+      return axis.modulus() / 2;
   }
   const double getAzimuth(){
       double x = city.getxi();

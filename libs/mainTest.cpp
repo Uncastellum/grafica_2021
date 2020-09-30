@@ -1,5 +1,6 @@
 #include <iostream>
 #include "Matrix.hpp"
+#include "Sphere.hpp"
 #include "GeOS.hpp"
 //g++ -std=c++11 mainTest.cpp -I. -O3 -o main
 
@@ -33,6 +34,13 @@ int main() {
     {2, 5, 4, 7},
     {-8, 5, -7, 5}
   };
+
+  VecPun center = VecPun(0,0,0,1);
+  VecPun axis = VecPun(2,0,0,0);
+  VecPun zgz = VecPun(1,0,0,1);
+  VecPun murcia = VecPun(8,0,0,1);
+  Sphere mars = Sphere(center,axis,zgz);
+  Sphere marsista = Sphere(center,axis,murcia);
 
   Matrix a = Matrix(m);
   Matrix mni = Matrix(no_inv);

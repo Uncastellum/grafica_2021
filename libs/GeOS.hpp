@@ -85,17 +85,18 @@ public:
     }
     return res;
   }
+  double modulus() const {
+    if (isVector()) {
+      double res = sqrt( pow(g[0],2) + pow(g[1],2) + pow(g[2],2) );
+      return res;
+    } else {
+      throw invalid_argument("Operation `modulus` is not defined for Points");
+    }
+  }
 };
 
 
-double modulus(const VecPun& a){
-  if (a.isVector()) {
-    double res = sqrt( pow(a.getxi(),2) + pow(a.getyj(),2) + pow(a.getzk(),2) );
-    return res;
-  } else {
-    throw invalid_argument("Operation `modulus` is not defined for Points");
-  }
-}
+
 
 double dotProduct(const VecPun& a, const VecPun& b) {
   if (a.isVector() && b.isVector()) {
