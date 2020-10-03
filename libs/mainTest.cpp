@@ -47,17 +47,19 @@ int main() {
 
   paint(a);
   cout << endl;
-  Matrix b = a.inv();
+  Matrix b = a.inv2();
+  cout << endl;
   paint(a*b);
   cout << endl;
-  paint(b*b.inv());
+  paint(b*b.inv2());
   cout << endl;cout << endl;cout << endl;
+
+
   paint(mni);
   cout << endl;
-  Matrix c = mni.inv();
-  paint(c);
-  cout << c(0,0) << "\n";
-  if ( isnan(c(0,0)) ) cout << "INVALID\n";
+  Matrix c = mni.inv2();
+  if (c.isValid()) paint(c);
+  else cout << "NO INVERSIBLE" << endl;
 
 
   double mv[4][4] = {
@@ -71,5 +73,4 @@ int main() {
   paint(v);
   v = v*mm;
   paint(v);
-
 }

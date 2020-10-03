@@ -20,17 +20,14 @@ public:
     axis = VecPun(2,0,0,0);
     city = VecPun(1,0,0,1);
   }
-  Sphere(VecPun &center_, VecPun &axis_, VecPun &city_){
+  Sphere(VecPun center_, VecPun axis_, VecPun city_){
     double radius = axis_.modulus() / 2;
     bool correct = fabs((city_ - center_).modulus() - radius) <= 1e-6;
-    if (correct)
-    {
+    if (correct) {
         center = center_;
         axis = axis_;
         city = city_;
-    }
-    else
-    {
+    } else {
         cout << "Planeta no coherente" << endl;
     }
   }
@@ -46,15 +43,15 @@ public:
   double getRadius(){
     return axis.modulus() / 2;
   }
-  double getInclinationRef() const {
+  double getInclinationRef()  {
     VecPun ref = city-center;
     double factor = dotProduct(axis, ref)/(ref.modulus()*axis.modulus());
     return acos(factor);
   }
-  double getAzimuthRef() const {
+  double getAzimuthRef()  {
     VecPun ref = city-center;
     double factor = crossProduct(axis, ref).modulus()/(ref.modulus()*axis.modulus());
-    return asen(factor);
+    return asin(factor);
     /*double x = city.getxi();
     double z = city.getzk();
     return atan(x / -z);*/
