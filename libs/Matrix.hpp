@@ -130,54 +130,7 @@ public:
     return res;
   }
 
-  // Check isnan(res(0,0)) to know if Matrix has inverse (GAUSS-JORDAN METHOD)
-  Matrix inv() {
-    double aug_m[LEN*2][LEN*2], temp;
-    for (int i = 0; i < LEN; i++) for (int j = 0; j < LEN; j++) aug_m[i][j] = m[i][j];
-
-    // Create the augmented matrix
-    // Add the identity matrix of order at the end of original matrix.
-    for (int i = 0; i < LEN; i++) {
-      for (int j = 0; j < 2 * LEN; j++) {
-        // Add '1' at the diagonal places of the matrix to create a identity matirx
-        if (j == (i + LEN)) aug_m[i][j] = 1;
-      }
-    }
-
-    // Interchange the row of matrix, interchanging of row will start from the last row
-    for (int i = LEN - 1; i > 0; i--) {
-      if (aug_m[i - 1][0] < aug_m[i][0]) {
-        for (int j = 0; j < 2*LEN; j++) {
-          temp = aug_m[i][j];
-          aug_m[i][j] = aug_m[i - 1][j];
-          aug_m[i - 1][j] = temp;
-        }
-      }
-    }
-
-    // Replace a row by sum of itself and a
-    // constant multiple of another row of the matrix
-    for (int i = 0; i < LEN; i++) {
-      for (int j = 0; j < LEN; j++) {
-        if (j != i) {
-          temp = aug_m[j][i] / aug_m[i][i];
-          for (int k = 0; k < 2*LEN; k++) aug_m[j][k] -= aug_m[i][k] * temp;
-        }
-      }
-    }
-
-    // Multiply each row by a nonzero integer. Divide row element by the diagonal element
-    for (int i = 0; i < LEN; i++) {
-      temp = aug_m[i][i];
-      for (int j = 0; j < 2*LEN; j++) aug_m[i][j] = aug_m[i][j] / temp;
-    }
-
-    Matrix res;
-    for (int i = 0; i < LEN; i++) for (int j = LEN; j < 2*LEN; j++) res.m[i][j-LEN] = aug_m[i][j];
-    return res;
-  }
-
-  Matrix inv2(){
+  Matrix inv(){
     double A2323 = m[2][2] * m[3][3] - m[2][3] * m[3][2] ;
     double A1323 = m[2][1] * m[3][3] - m[2][3] * m[3][1] ;
     double A1223 = m[2][1] * m[3][2] - m[2][2] * m[3][1] ;

@@ -48,12 +48,9 @@ public:
     double factor = dotProduct(axis, ref)/(ref.modulus()*axis.modulus());
     return acos(factor);
   }
-  double getAzimuthRef()  {
+  double getAzimuthRef() const {
     VecPun ref = city-center;
     double factor = crossProduct(axis, ref).modulus()/(ref.modulus()*axis.modulus());
     return asin(factor);
-    /*double x = city.getxi();
-    double z = city.getzk();
-    return atan(x / -z);*/
   }
 };

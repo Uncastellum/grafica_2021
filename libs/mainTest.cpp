@@ -47,17 +47,17 @@ int main() {
 
   paint(a);
   cout << endl;
-  Matrix b = a.inv2();
+  Matrix b = a.inv();
   cout << endl;
   paint(a*b);
   cout << endl;
-  paint(b*b.inv2());
+  paint(b*b.inv());
   cout << endl;cout << endl;cout << endl;
 
 
   paint(mni);
   cout << endl;
-  Matrix c = mni.inv2();
+  Matrix c = mni.inv();
   if (c.isValid()) paint(c);
   else cout << "NO INVERSIBLE" << endl;
 
