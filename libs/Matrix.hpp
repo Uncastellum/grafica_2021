@@ -71,7 +71,7 @@ public:
       case y_axis:
         m[0][0] = cos(angle);
         m[0][2] = -sin(angle);
-        //m[2][0]= sin(angle); //MIRAR <--------------- MIRAR <---------------------- MIRAR
+        m[2][0]= sin(angle);
         m[2][2] = cos(angle);
         break;
       case z_axis:

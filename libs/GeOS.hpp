@@ -8,6 +8,8 @@
 
 using namespace std;
 
+enum VecPunComp { xi = 0, yj = 1, zk = 2 };
+
 class VecPun {
 private:
   double g[4];
@@ -24,6 +26,26 @@ public:
   }
   bool isVector() const {
     return g[3] == 0;
+  }
+  double& operator[](VecPunComp c){
+    switch (c) {
+      case xi:
+        return g[0];
+      case yj:
+        return g[1];
+      case zk:
+        return g[2];
+    }
+  }
+  double operator[](VecPunComp c) const {
+    switch (c) {
+      case xi:
+        return g[0];
+      case yj:
+        return g[1];
+      case zk:
+        return g[2];
+    }
   }
   double getxi() const {
     return g[0];
@@ -100,7 +122,7 @@ public:
 
 double dotProduct(const VecPun& a, const VecPun& b) {
   if (a.isVector() && b.isVector()) {
-    double res = a.getxi()*b.getxi() + a.getyj()*b.getyj() + a.getzk()*b.getzk();
+    double res = a[xi]*b[xi] + a[yj]*b[yj] + a[zk]*b[zk];
     return res;
   } else {
     throw invalid_argument("Operation `dotProduct` is not defined for Points");
@@ -108,7 +130,7 @@ double dotProduct(const VecPun& a, const VecPun& b) {
 }
 VecPun crossProduct(const VecPun& a, const VecPun& b) {
   if (a.isVector() && b.isVector()) {
-    VecPun res = VecPun(a.getxi()*b.getxi(), a.getyj()*b.getyj(), a.getzk()*b.getzk(), false);
+    VecPun res = VecPun(a[xi]*b[xi], a[yj]*b[yj], a[zk]*b[zk], false);
     return res;
   } else {
     throw invalid_argument("Operation `crossProduct` is not defined for Points");

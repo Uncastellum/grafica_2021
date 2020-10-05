@@ -9,11 +9,17 @@
 
 using namespace std;
 
+// MINI PARCHE ANTI COMPILADOR
+class Sphere;
+class SpherePoint;
+
 class Sphere {
 private:
   VecPun center;
   VecPun axis;
   VecPun city;
+  friend class SpherePoint;
+
 public:
   Sphere(){
     center = VecPun(0,0,0,1);
@@ -40,7 +46,7 @@ public:
   VecPun getCity() const {
     return city;
   }
-  double getRadius(){
+  double getRadius() const {
     return axis.modulus() / 2;
   }
   double getInclinationRef() const {
@@ -53,4 +59,48 @@ public:
     double factor = crossProduct(axis, ref).modulus()/(ref.modulus()*axis.modulus());
     return asin(factor);
   }
+
 };
+
+class SpherePoint {
+private:
+  VecPun local_coor;
+  Sphere sph;
+  friend class Sphere;
+
+public:
+  SpherePoint(){
+  }
+  SpherePoint(const Sphere& sh, const VecPun lcoor){
+    local_coor = lcoor; //lcoor must be local coordinates based in sh coor system.
+    sph = sh;
+  }
+
+  VecPun getLocalCoor() const {
+    return local_coor;
+  }
+  VecPun getCoor() const {
+    VecPun aux = local_coor;
+    aux[xi] += sph.center[xi];
+    aux[yj] += sph.center[yj];
+    aux[zk] += sph.center[zk];
+    return aux;
+  }
+  VecPun getNormal(const VecPun& coor) const {
+    return local_coor-sph.center;
+  }
+  VecPun getConexion(const SpherePoint station) const {
+    VecPun a = getCoor();
+    VecPun b = station.getCoor();
+    return VecPun(b.getxi()-a.getxi(),b.getyj()-a.getyj(),b.getzk()-a.getzk(),0);
+  }
+};
+
+SpherePoint getPoint(const Sphere& sh, const double azim, const double incl) {
+  double azim_r = sh.getAzimuthRef() - azim,
+         radius = sh.getRadius();
+  double x = radius * sin(azim_r) * cos(incl),
+         y = radius * sin(incl) * cos(azim_r),
+         z = radius * cos(azim_r);
+  return SpherePoint(sh, VecPun(x, y, z, true));
+}
