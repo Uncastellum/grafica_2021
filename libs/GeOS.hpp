@@ -43,7 +43,7 @@ public:
   void setzk(int zk){
     g[2] = zk;
   }
-  VecPun operator-(const VecPun& other){
+  VecPun operator-(const VecPun& other) const {
     if(isPoint() && other.isPoint()) {
       VecPun res = VecPun(g[0] - other.g[0], g[1] - other.g[1], g[2] - other.g[2], false);
       return res;
@@ -55,7 +55,7 @@ public:
             + isPoint() ? "Point - ":"Vector - " + other.isPoint() ? "Point":"Vector");
     }
   }
-  VecPun operator+(const VecPun& other){
+  VecPun operator+(const VecPun& other) const {
     if(isVector() && other.isVector()){
       VecPun res = VecPun(g[0] + other.g[0], g[1] + other.g[1], g[2] + other.g[2], false);
       return res;
@@ -67,7 +67,7 @@ public:
             + isPoint() ? "Point + ":"Vector + " + other.isPoint() ? "Point":"Vector");
     }
   }
-  VecPun operator*(double escalar){
+  VecPun operator*(double escalar) const {
     if(isVector()){
       VecPun res = VecPun(g[0]*escalar, g[1]*escalar, g[2]  *escalar, false);
       return res;
@@ -75,7 +75,7 @@ public:
       throw invalid_argument("Operator * is not defined for this operation: Point * Escalar");
     }
   }
-  VecPun operator*(const Matrix& m){
+  VecPun operator*(const Matrix& m) const {
     VecPun res;
     for (int i = 0; i < LEN; i++) {
       res.g[i] = 0;

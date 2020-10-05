@@ -96,7 +96,7 @@ public:
     return m[row][col];
   }
 
-  Matrix operator*(const Matrix& b){
+  Matrix operator*(const Matrix& b) const {
     Matrix res;
     for(int i=0; i<LEN; i++){
       for(int j=0; j<LEN; j++){
@@ -110,7 +110,7 @@ public:
     return res;
   }
 
-  Matrix operator+(const Matrix& b){
+  Matrix operator+(const Matrix& b) const {
     Matrix res;
     for(int i=0; i<LEN; i++){
       for(int j=0; j<LEN; j++){
@@ -120,7 +120,7 @@ public:
     return res;
   }
 
-  Matrix operator-(const Matrix& b){
+  Matrix operator-(const Matrix& b) const {
     Matrix res;
     for(int i=0; i<LEN; i++){
       for(int j=0; j<LEN; j++){

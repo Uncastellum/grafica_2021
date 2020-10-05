@@ -31,19 +31,19 @@ public:
         cout << "Planeta no coherente" << endl;
     }
   }
-  VecPun getCenter(){
+  VecPun getCenter() const {
     return center;
   }
-  VecPun getAxis(){
+  VecPun getAxis() const {
     return axis;
   }
-  VecPun getCity(){
+  VecPun getCity() const {
     return city;
   }
   double getRadius(){
     return axis.modulus() / 2;
   }
-  double getInclinationRef()  {
+  double getInclinationRef() const {
     VecPun ref = city-center;
     double factor = dotProduct(axis, ref)/(ref.modulus()*axis.modulus());
     return acos(factor);
