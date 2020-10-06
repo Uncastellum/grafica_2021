@@ -1,5 +1,7 @@
 #pragma once
 
+//Compile test: g++ -std=c++11 -I. GeOS.hpp -O3 -o efe.o
+
 #include <iostream>
 #include <exception>
 #include <cmath>

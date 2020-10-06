@@ -1,5 +1,6 @@
 #pragma once
-//g++ -std=c++11 matrix.h -I geos.h -O3 -o efe.o
+
+//Compile test: g++ -std=c++11 -I. Matrix.hpp -O3 -o efe.o
 
 #include <iostream>
 #include <cassert>
