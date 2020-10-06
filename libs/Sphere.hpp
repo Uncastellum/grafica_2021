@@ -59,7 +59,6 @@ public:
     double factor = crossProduct(axis, ref).modulus()/(ref.modulus()*axis.modulus());
     return asin(factor);
   }
-
 };
 
 class SpherePoint {
@@ -92,7 +91,10 @@ public:
   VecPun getConexion(const SpherePoint station) const {
     VecPun a = getCoor();
     VecPun b = station.getCoor();
-    return VecPun(b.getxi()-a.getxi(),b.getyj()-a.getyj(),b.getzk()-a.getzk(),0);
+    return VecPun(b.getxi()-a.getxi(),b.getyj()-a.getyj(),b.getzk()-a.getzk(), 0);
+  }
+  void getTangs(VecPun &lat, VecPun &lon) {
+
   }
 };
 

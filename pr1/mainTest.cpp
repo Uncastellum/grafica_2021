@@ -2,7 +2,8 @@
 #include "Matrix.hpp"
 #include "Sphere.hpp"
 #include "GeOS.hpp"
-//g++ -std=c++11 mainTest.cpp -I. -O3 -o main
+
+//g++ -std=c++11 -I ../libs mainTest.cpp -O3 -o main
 
 using namespace std;
 
