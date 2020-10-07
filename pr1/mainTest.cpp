@@ -20,6 +20,13 @@ void paint(VecPun v){
   printf("%.3f  ", v.getzk());
   cout << endl;
 }
+void paint(SpherePoint sp){
+  VecPun v = sp.getCoor();
+  printf("%.3f  ", v.getxi());
+  printf("%.3f  ", v.getyj());
+  printf("%.3f  ", v.getzk());
+  cout << endl;
+}
 
 
 int main() {
@@ -50,6 +57,7 @@ int main() {
   SpherePoint pa = getPoint(sa,sa.getAzimuthRef(),sa.getInclinationRef());
   SpherePoint pb = getPoint(sb,sb.getAzimuthRef(),sb.getInclinationRef());
   VecPun con = pa.getConexion(pb);
+  paint(pa); paint(pb);
   paint(con);
 
   cout <<"Prueba matrix"<< endl;

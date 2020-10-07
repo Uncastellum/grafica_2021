@@ -97,8 +97,8 @@ public:
     return VecPun( b[xi]-a[xi], b[yj]-a[yj], b[zk]-a[zk], false);
   }
   void getTangs(VecPun &lat, VecPun &lon) const {
-    VecPun normal = getNormal(coor);
-    lon = crossProduct(normal, sh.axis);
+    VecPun normal = getNormal();
+    lon = crossProduct(normal, sph.axis);
     lat = crossProduct(normal, lon);
   }
 };
