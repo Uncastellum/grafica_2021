@@ -36,6 +36,7 @@ int main() {
     {-8, 5, -7, 5}
   };
 
+  cout <<"Prueba radio"<< endl;
   VecPun center = VecPun(0,0,0,1);
   VecPun axis = VecPun(2,0,0,0);
   VecPun zgz = VecPun(1,0,0,1);
@@ -43,6 +44,15 @@ int main() {
   Sphere mars = Sphere(center,axis,zgz);
   Sphere marsista = Sphere(center,axis,murcia);
 
+  cout <<"Prueba conexion"<< endl;
+  Sphere sa = Sphere(VecPun(0,0,0,1),VecPun(0,2,0,0),VecPun(1,0,0,1));
+  Sphere sb = Sphere(VecPun(3,0,0,1),VecPun(0,2,0,0),VecPun(2,0,0,1));
+  SpherePoint pa = getPoint(sa,sa.getAzimuthRef(),sa.getInclinationRef());
+  SpherePoint pb = getPoint(sb,sb.getAzimuthRef(),sb.getInclinationRef());
+  VecPun con = pa.getConexion(pb);
+  paint(con);
+
+  cout <<"Prueba matrix"<< endl;
   Matrix a = Matrix(m);
   Matrix mni = Matrix(no_inv);
 
