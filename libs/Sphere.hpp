@@ -65,30 +65,31 @@ public:
 
 class SpherePoint {
 private:
-  VecPun local_coor;
-  Sphere sph;
+  VecPun coor; // GLOBAL COOR
+  Sphere sph; // coor ϵ sph surface / sph surface contains coor
   friend class Sphere;
 
 public:
   SpherePoint(){
   }
-  SpherePoint(const Sphere& sh, const VecPun lcoor){
-    local_coor = lcoor; //lcoor must be local coordinates based in sh coor system.
+  SpherePoint(const Sphere& sh, const VecPun coor_){
+    coor = coor_; // coor ϵ sph surface / sph surface contains coor
     sph = sh;
   }
 
   VecPun getLocalCoor() const {
-    return local_coor;
-  }
-  VecPun getCoor() const {
-    VecPun aux = local_coor;
-    aux[xi] += sph.center[xi];
-    aux[yj] += sph.center[yj];
-    aux[zk] += sph.center[zk];
+    // Point (0,0,0) is the center of sph
+    VecPun aux = coor;
+    aux[xi] -= sph.center[xi];
+    aux[yj] -= sph.center[yj];
+    aux[zk] -= sph.center[zk];
     return aux;
   }
+  VecPun getCoor() const {
+    return coor;
+  }
   VecPun getNormal(const VecPun& coor) const {
-    return local_coor-sph.center;
+    return coor-sph.center;
   }
   VecPun getConexion(const SpherePoint station) const {
     VecPun a = getCoor();
@@ -101,10 +102,11 @@ public:
 };
 
 SpherePoint getPoint(const Sphere& sh, const double azim, const double incl) {
+  VecPun center = sh.getCenter();
   double azim_r = sh.getAzimuthRef() - azim,
          radius = sh.getRadius();
-  double x = radius * sin(azim_r) * cos(incl),
-         y = radius * sin(incl) * cos(azim_r),
-         z = radius * cos(azim_r);
+  double x = center[xi] + radius * sin(incl) * sin(azim_r),
+         y = center[yj] + radius * sin(incl) * cos(azim_r),
+         z = center[zk] + radius * cos(incl);
   return SpherePoint(sh, VecPun(x, y, z, true));
 }

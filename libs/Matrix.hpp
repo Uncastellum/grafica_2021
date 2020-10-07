@@ -53,7 +53,7 @@ public:
   }
 
   Matrix(matrix_type type, rotate_axis rt, double angle){
-    assert(matrix_type::rotate != type);
+    assert(matrix_type::rotate == type);
     valid = true;
     //static_assert( (matrix_type::rotate != type),
     //    "This constructor can be only used to use `rotate` transformaion");
