@@ -28,7 +28,7 @@ public:
     axis = VecPun(2,0,0,0);
     city = VecPun(1,0,0,1);
   }
-  Sphere(VecPun center_, VecPun axis_, VecPun city_){
+  Sphere(const VecPun center_, const VecPun axis_, const VecPun city_){
     double radius = axis_.modulus() / 2;
     bool correct = fabs((city_ - center_).modulus() - radius) <= 1e-6;
     if (correct) {
@@ -57,9 +57,10 @@ public:
     return acos(factor);
   }
   double getAzimuthRef() const {
-    VecPun ref = city-center;
-    double factor = crossProduct(axis, ref).modulus()/(ref.modulus()*axis.modulus());
-    return asin(factor);
+    //VecPun ref = city-center;
+    //double factor = crossProduct(axis, ref).modulus()/(ref.modulus()*axis.modulus());
+    //return asin(factor);
+    return atanf(city[xi]/ -city[zk]);
   }
 };
 
