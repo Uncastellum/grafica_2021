@@ -88,16 +88,18 @@ public:
   VecPun getCoor() const {
     return coor;
   }
-  VecPun getNormal(const VecPun& coor) const {
+  VecPun getNormal() const {
     return coor-sph.center;
   }
   VecPun getConexion(const SpherePoint station) const {
     VecPun a = getCoor();
     VecPun b = station.getCoor();
-    return VecPun(b.getxi()-a.getxi(),b.getyj()-a.getyj(),b.getzk()-a.getzk(), 0);
+    return VecPun( b[xi]-a[xi], b[yj]-a[yj], b[zk]-a[zk], false);
   }
-  void getTangs(VecPun &lat, VecPun &lon) {
-
+  void getTangs(VecPun &lat, VecPun &lon) const {
+    VecPun normal = getNormal(coor);
+    lon = crossProduct(normal, sh.axis);
+    lat = crossProduct(normal, lon);
   }
 };
 
