@@ -7,7 +7,6 @@
 
 using namespace std;
 
-
 void paint(Matrix m){
   for (int i = 0; i < 4; i++) {
     for (int j = 0; j < 4; j++) printf("%.3f  ", m(i,j));
@@ -52,14 +51,11 @@ int main() {
   Sphere marsista = Sphere(center,axis,murcia);
 
   cout <<"Prueba conexion"<< endl;
-  Sphere sa = Sphere(VecPun(0,0,0,1),VecPun(0,2,0,0),VecPun(1,0,0,1));
-  Sphere sb = Sphere(VecPun(3,0,0,1),VecPun(0,2,0,0),VecPun(2,0,0,1));
+  Sphere sa = Sphere(VecPun(0,0,0,1), VecPun(0,2,0,0), VecPun(1,0,0,1));
+  Sphere sb = Sphere(VecPun(3,0,0,1), VecPun(0,2,0,0), VecPun(2,0,0,1));
 
-  cout << sa.getAzimuthRef() << ", " << sa.getInclinationRef() << endl;
-  cout << sb.getAzimuthRef() << ", " << sb.getInclinationRef() << endl;
-
-  SpherePoint pa = getPoint(sa,sa.getInclinationRef(),sa.getAzimuthRef());
-  SpherePoint pb = getPoint(sb,sb.getInclinationRef(),sb.getAzimuthRef());
+  SpherePoint pa = getPoint(sa, 0, RAD_DEG90);
+  SpherePoint pb = getPoint_degree(sb, 180, 90);
   VecPun con = pa.getConexion(pb);
   paint(pa); paint(pb);
   paint(con);

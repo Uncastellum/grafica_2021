@@ -6,10 +6,16 @@
 #include <exception>
 #include <cmath>
 #include "GeOS.hpp"
-
-//#include "Matrix.hpp"
+#include "Matrix.hpp"
 
 using namespace std;
+
+#define PI 3.1415926535
+#define RAD_DEG270 PI*3/2
+#define RAD_DEG180 PI/1
+#define RAD_DEG90 PI/2
+#define RAD_DEG45 PI/4
+#define RAD_DEG30 PI/6
 
 // MINI PARCHE ANTI COMPILADOR
 class Sphere;
@@ -51,17 +57,19 @@ public:
   double getRadius() const {
     return axis.modulus() / 2;
   }
-  double getInclinationRef() const {
+  double getInclinationCRef() const {
     VecPun ref = city-center;
     double factor = dotProduct(axis, ref)/(ref.modulus()*axis.modulus());
     return acos(factor);
   }
-  double getAzimuthRef() const {
-    //VecPun ref = city-center;
-    //double factor = crossProduct(axis, ref).modulus()/(ref.modulus()*axis.modulus());
-    //return asin(factor);
-    return atanf(city[xi]/ -city[zk]);
+  /*
+  double getAzimuthCRef() const {
+    VecPun ref = city-center;
+    double factor = crossProduct(axis, ref).modulus()/(ref.modulus()*axis.modulus());
+    return asin(factor);
+    //return atanf(city[xi]/ -city[zk]);
   }
+  */
 };
 
 class SpherePoint {
@@ -105,11 +113,23 @@ public:
 };
 
 SpherePoint getPoint(const Sphere& sh, const double azim, const double incl) {
+  VecPun vref = sh.getAxis()*0.5;
+  vref = vref * Matrix(rotate, z_axis, incl) * Matrix(rotate, y_axis, azim);
+  return SpherePoint(sh, sh.getCenter() + vref);
+  /*
   VecPun center = sh.getCenter();
-  double azim_r = sh.getAzimuthRef() - azim,
+  double azim_r = sh.getAzimuth-Ref() - azim,
          radius = sh.getRadius();
   double x = center[xi] + radius * sin(incl) * sin(azim_r),
          y = center[yj] + radius * sin(incl) * cos(azim_r),
          z = center[zk] + radius * cos(incl);
-  return SpherePoint(sh, VecPun(x, y, z, true));
+  return SpherePoint(sh, VecPun(x, y, z, true)); */
+}
+
+SpherePoint getPoint_degree(const Sphere& sh, const double azim, const double incl) {
+  double azim_r = azim/180*PI,
+         incl_r = incl/180*PI;
+  VecPun vref = sh.getAxis()*0.5;
+  vref = vref * Matrix(rotate, z_axis, incl) * Matrix(rotate, y_axis, azim);
+  return SpherePoint(sh, sh.getCenter() + vref);
 }
