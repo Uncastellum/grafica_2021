@@ -52,10 +52,10 @@ int main() {
 
   cout <<"Prueba conexion"<< endl;
   Sphere sa = Sphere(VecPun(0,0,0,1), VecPun(0,2,0,0), VecPun(1,0,0,1));
-  Sphere sb = Sphere(VecPun(3,0,0,1), VecPun(0,2,0,0), VecPun(2,0,0,1));
-
-  SpherePoint pa = getPoint(sa, 0, RAD_DEG90);
-  SpherePoint pb = getPoint_degree(sb, 180, 90);
+  Sphere sb = Sphere(VecPun(3,0,0,1), VecPun(0,2,0,0), VecPun(2,0,0,1));//Da mismo resul si cambias la ciudad (2001 por 4001)
+  SpherePoint pa = getPoint(sa, 0, PI/2);
+  SpherePoint pb = getPoint(sb, PI, PI/2);//¿Entonces la ciudad de referencia no es ninguna referencia?
+  //SpherePoint pb = getPoint_degree(sb, 180, 90);
   VecPun con = pa.getConexion(pb);
   paint(pa); paint(pb);
   paint(con);
