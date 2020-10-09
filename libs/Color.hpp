@@ -6,6 +6,7 @@
 #include <cassert>
 #include <fstream>
 #include <string>
+#include <vector>
 
 using namespace std;
 
@@ -17,7 +18,7 @@ private:
   };
   string pSix, max_comm, name;
   int width, height, max;
-  RGB *cached;
+  vector<RGB> cached;
 
 
 public:
@@ -40,24 +41,17 @@ public:
     printf("Height: %d\n", height);
     printf("maximum: %d\n", max);
 
-    cached = new RGB[width*height];
-
-    int count = 0;
-    while (!f.eof() && width*height > count) {
+    while (!f.eof() && width*height > cached.size()) {
       RGB aux;
       f >> aux.red;
       f >> aux.green;
       f >> aux.blue;
-      cached[count] = aux;
-      count++;
+      cached.push_back(aux);
     }
     //cout << count << "/" << width*height << ", " << f.eof() << endl;
     //string rest; f >> rest; cout << rest << f.eof() << endl;
 
     f.close();
-  }
-  ~Image(){
-    delete[] cached;
   }
 
   transform(){
