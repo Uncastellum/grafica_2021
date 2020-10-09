@@ -42,23 +42,42 @@ int main() {
     {-8, 5, -7, 5}
   };
 
-  cout <<"Prueba radio"<< endl;
+  cout <<"++|++|++|++ Prueba radio ++|++|++|++"<< endl;
+  cout <<"(Comprobamos que la ciudad esta a distancia radio)"<< endl;
   VecPun center = VecPun(0,0,0,1);
   VecPun axis = VecPun(2,0,0,0);
   VecPun zgz = VecPun(1,0,0,1);
   VecPun murcia = VecPun(8,0,0,1);
+  cout <<"1.El siguiente planeta deberia ser correcto"<< endl;
   Sphere mars = Sphere(center,axis,zgz);
+  cout <<"2.El siguiente planeta deberia ser incorrecto"<< endl;
   Sphere marsista = Sphere(center,axis,murcia);
+  cout<<endl;
 
-  cout <<"Prueba conexion"<< endl;
+  cout <<"++|++|++|++ Prueba conexion ++|++|++|++"<< endl;
+  cout <<"(Comprobamos conexion entre 2 estaciones)"<< endl;
+  cout <<"1.Conexion sin colision (1,0,0)"<< endl;
   Sphere sa = Sphere(VecPun(0,0,0,1), VecPun(0,2,0,0), VecPun(1,0,0,1));
-  Sphere sb = Sphere(VecPun(3,0,0,1), VecPun(0,2,0,0), VecPun(2,0,0,1));//Da mismo resul si cambias la ciudad (2001 por 4001)
+  Sphere sb = Sphere(VecPun(3,0,0,1), VecPun(0,2,0,0), VecPun(2,0,0,1));
   SpherePoint pa = getPoint(sa, 0, PI/2);
-  SpherePoint pb = getPoint(sb, PI, PI/2);//¿Entonces la ciudad de referencia no es ninguna referencia?
+  SpherePoint pb = getPoint(sb, PI, PI/2);
   //SpherePoint pb = getPoint_degree(sb, 180, 90);
   VecPun con = pa.getConexion(pb);
-  paint(pa); paint(pb);
+  //paint(pa); paint(pb);
+  cout<<"La conexion es: ";
   paint(con);
+  cout<<endl;
+  cout <<"2.Conexion con colision (3,0,0)"<< endl;
+  sa = Sphere(VecPun(0,0,0,1), VecPun(0,2,0,0), VecPun(1,0,0,1));
+  sb = Sphere(VecPun(3,0,0,1), VecPun(0,2,0,0), VecPun(2,0,0,1));
+  pa = getPoint(sa, 0, PI/2);
+  pb = getPoint(sb, 0, PI/2);
+  //SpherePoint pb = getPoint_degree(sb, 180, 90);
+  con = pa.getConexion(pb);
+  //paint(pa); paint(pb);
+  cout<<"La conexion es: ";
+  paint(con);
+  cout<<endl;
 
   /*cout <<"Prueba matrix"<< endl;
   Matrix a = Matrix(m);

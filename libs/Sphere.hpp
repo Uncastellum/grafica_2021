@@ -103,7 +103,12 @@ public:
   VecPun getConexion(const SpherePoint station) const {
     VecPun a = getCoor();
     VecPun b = station.getCoor();
-    return VecPun( b[xi]-a[xi], b[yj]-a[yj], b[zk]-a[zk], false);
+    VecPun c = VecPun( b[xi]-a[xi], b[yj]-a[yj], b[zk]-a[zk], false);
+    double choca_a = dotProduct(c,getNormal());
+    double choca_b = dotProduct(c,station.getNormal());
+    if(choca_a<0) cout<<"La conexion atraviesa el primer planeta"<<endl;
+    if(choca_b>0) cout<<"La conexion atraviesa el segundo planeta"<<endl;
+    return c;
   }
   void getTangs(VecPun &lat, VecPun &lon) const {
     VecPun normal = getNormal();
