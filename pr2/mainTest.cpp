@@ -76,8 +76,36 @@ int main(){
   cout << "I4 Exportar: " << read_time << " segundos" << endl;
 
 
-  /*
+  t0 = clock();
   Image i5("ppm/mpi_atrium_3.ppm");
-  i5.apply_tone_mapper(equalization);
-  i5.exportLDR("ppm/prueba_sin_tone.ppm"); */
+  t1 = clock();
+  read_time = (double(t1-t0)/CLOCKS_PER_SEC);
+  cout << "I5 Crear: " << read_time << " segundos" << endl;
+  t0 = clock();
+  i5.apply_tone_mapper(gamma_curve, 1, 0.3);
+  t1 = clock();
+  read_time = (double(t1-t0)/CLOCKS_PER_SEC);
+  cout << "I5 Mapper: " << read_time << " segundos" << endl;
+  t0 = clock();
+  i5.exportLDR("ppm/prueba_gamma_curve.ppm");
+  t1 = clock();
+  read_time = (double(t1-t0)/CLOCKS_PER_SEC);
+  cout << "I5 Exportar: " << read_time << " segundos" << endl;
+
+
+  t0 = clock();
+  Image i6("ppm/mpi_atrium_3.ppm");
+  t1 = clock();
+  read_time = (double(t1-t0)/CLOCKS_PER_SEC);
+  cout << "I6 Crear: " << read_time << " segundos" << endl;
+  t0 = clock();
+  i6.apply_tone_mapper(clamp_gamma, 14, 0.3);
+  t1 = clock();
+  read_time = (double(t1-t0)/CLOCKS_PER_SEC);
+  cout << "I6 Mapper: " << read_time << " segundos" << endl;
+  t0 = clock();
+  i6.exportLDR("ppm/prueba_clamp_gamma.ppm");
+  t1 = clock();
+  read_time = (double(t1-t0)/CLOCKS_PER_SEC);
+  cout << "I6 Exportar: " << read_time << " segundos" << endl;
 }

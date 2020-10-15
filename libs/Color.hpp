@@ -7,6 +7,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <cmath>
 
 using namespace std;
 
@@ -82,7 +83,9 @@ public:
 
   // img.apply_tone_mapper(clamp);
   // img.apply_tone_mapper(clamp_equaliz, 0.456);
-  apply_tone_mapper(t_mapper map, float clamp_param = 1){
+  // img.apply_tone_mapper(gamma_curve, X, 0.456);  X = dont care
+  // img.apply_tone_mapper(clamp_gamma, 0.456, 0,5);
+  apply_tone_mapper(t_mapper map, float clamp_param = 1, float gamma_param = 1) {
     float clmp = map == clamp ? 1 : clamp_param;
     if (map == clamp || map == clamp_equaliz || map == clamp_gamma) {
       for (size_t i = 0; i < width*height; i++) {
@@ -108,12 +111,11 @@ public:
 
     if (map == gamma_curve || map == clamp_gamma){
       for (size_t i = 0; i < width*height; i++) {
-        /* code */
+        cached[i].red = pow(cached[i].red, gamma_param);
+        cached[i].green = pow(cached[i].green, gamma_param);
+        cached[i].blue = pow(cached[i].blue, gamma_param);
       }
     }
-
-
-
   }
 
 };
