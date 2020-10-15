@@ -40,14 +40,7 @@ public:
     // string::#MAX=xxxxxx => float::xxxxxx
     real_max = stof(max_comm.erase(0, 5));
 
-    cout << "Name: " << name << endl;
-    //cout << "PSix: " << pSix << endl;
-    //cout << "real_max: " << real_max << endl;
-    printf("Width: %d\n", width);
-    printf("Height: %d\n", height);
-    //printf("maximum: %d\n", res_color);
-
-    while (!f.eof() && width*height > cached.size()) {
+    while (!f.eof()) {
       RGB aux;
       f >> aux.red;
       f >> aux.green;
@@ -60,6 +53,7 @@ public:
     f.close();
   }
 
+#pragma GCC optimize("O0")
   exportLDR(string file){
     ofstream f(file);
     assert(f.is_open());
