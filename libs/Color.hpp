@@ -54,7 +54,7 @@ public:
   }
 
 #pragma GCC optimize("O0")
-  exportLDR(string file){
+  void exportLDR(string file){
     ofstream f(file);
     assert(f.is_open());
     f << pSix << endl;
@@ -79,7 +79,7 @@ public:
   // img.apply_tone_mapper(clamp_equaliz, 0.456);
   // img.apply_tone_mapper(gamma_curve, X, 0.456);  X = dont care
   // img.apply_tone_mapper(clamp_gamma, 0.456, 0,5);
-  apply_tone_mapper(t_mapper map, float clamp_param = 1, float gamma_param = 1) {
+  void apply_tone_mapper(t_mapper map, float clamp_param = 1, float gamma_param = 1) {
     float clmp = map == clamp ? 1 : clamp_param;
     if (map == clamp || map == clamp_equaliz || map == clamp_gamma) {
       for (size_t i = 0; i < width*height; i++) {
