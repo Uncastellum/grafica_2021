@@ -39,7 +39,7 @@ public:
     // string::#MAX=xxxxxx => float::xxxxxx
     real_max = stof(max_comm.erase(0, 5));
 
-    /cout << "Name: " << name << endl;
+    cout << "Name: " << name << endl;
     //cout << "PSix: " << pSix << endl;
     //cout << "real_max: " << real_max << endl;
     printf("Width: %d\n", width);

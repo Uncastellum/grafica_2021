@@ -4,4 +4,5 @@
 *.dll
 *.lnk
 *.ppm
+*.bmp
 pr2/*.zip
