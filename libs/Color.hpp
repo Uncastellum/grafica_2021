@@ -10,14 +10,17 @@
 
 using namespace std;
 
+enum t_mapper { clamp, equalization, clamp_equaliz, gamma_curve, clamp_gamma };
+
 
 class Image {
 private:
   struct RGB {
-    unsigned int red, green, blue;
+    float red, green, blue;
   };
   string pSix, max_comm, name;
-  int width, height, max;
+  int width, height, res_color;
+  float real_max;
   vector<RGB> cached;
 
 
@@ -31,51 +34,86 @@ public:
     getline(f, name);
     f >> width;
     f >> height;
-    f >> max;
+    f >> res_color;
 
-    //printf("Name: %s\n", name);               //WTF
-    cout << "Name: " << name << endl;
-    //printf("PSix: %s\n", pSix);               //WTF
-    cout << "PSix: " << pSix << endl;
+    // string::#MAX=xxxxxx => float::xxxxxx
+    real_max = stof(max_comm.erase(0, 5));
+
+    /cout << "Name: " << name << endl;
+    //cout << "PSix: " << pSix << endl;
+    //cout << "real_max: " << real_max << endl;
     printf("Width: %d\n", width);
     printf("Height: %d\n", height);
-    printf("maximum: %d\n", max);
+    //printf("maximum: %d\n", res_color);
 
     while (!f.eof() && width*height > cached.size()) {
       RGB aux;
       f >> aux.red;
       f >> aux.green;
       f >> aux.blue;
+      aux.red *= real_max/res_color;
+      aux.green *= real_max/res_color;
+      aux.blue *= real_max/res_color;
       cached.push_back(aux);
     }
-    //cout << count << "/" << width*height << ", " << f.eof() << endl;
-    //string rest; f >> rest; cout << rest << f.eof() << endl;
-
     f.close();
   }
 
-  transform(){
+  exportLDR(string file){
+    ofstream f(file);
+    assert(f.is_open());
+    f << pSix << endl;
+    f << "#MAX=1" << endl;
+    f << name << endl;
+    f << width << " " << height << endl;
+    f << 255 << endl;
     for (int i = 0; i < width*height; i++) {
-      //cached[i].red *= max_comm/max;
-      //cached[i].green *= max_comm/max;
-      //cached[i].blue *= max_comm/max;
+      int r = cached[i].red * 255;
+      int g = cached[i].green * 255;
+      int b = cached[i].blue * 255;
+      if(r > 255) r=255;
+      if(g > 255) g=255;
+      if(b > 255) b=255;
+      f << r << " " << g << " " << b << "     ";
+      if ((i%width)==width-1) f << endl;
     }
+    f.close();
   }
-  tonemapping(){
+
+  // img.apply_tone_mapper(clamp);
+  // img.apply_tone_mapper(clamp_equaliz, 0.456);
+  apply_tone_mapper(t_mapper map, float clamp_param = 1){
+    float clmp = map == clamp ? 1 : clamp_param;
+    if (map == clamp || map == clamp_equaliz || map == clamp_gamma) {
+      for (size_t i = 0; i < width*height; i++) {
+        cached[i].red = cached[i].red > clmp ? 1 : cached[i].red;
+        cached[i].green = cached[i].green > clmp ? 1 : cached[i].green;
+        cached[i].blue = cached[i].blue > clmp ? 1 : cached[i].blue;
+      }
+    }
+
+    if (map == equalization || map == clamp_equaliz || map == gamma_curve || map == clamp_gamma) {
+      float max = 0;
+      for (size_t i = 0; i < width*height; i++) {
+        if (cached[i].red > max) max = cached[i].red;
+        if (cached[i].green > max) max = cached[i].green;
+        if (cached[i].blue > max) max = cached[i].blue;
+      }
+      for (size_t i = 0; i < width*height; i++) {
+        cached[i].red = cached[i].red/max;
+        cached[i].green = cached[i].green/max;
+        cached[i].blue = cached[i].blue/max;
+      }
+    }
+
+    if (map == gamma_curve || map == clamp_gamma){
+      for (size_t i = 0; i < width*height; i++) {
+        /* code */
+      }
+    }
+
+
 
   }
 
 };
-
-
-
-
-
-
-
-
-
-
-
-
-// .
