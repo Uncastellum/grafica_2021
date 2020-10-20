@@ -89,7 +89,8 @@ int main() {
     cout << " 2 - equalization\n";
     cout << " 3 - clamp_equaliz\n";
     cout << " 4 - gamma_curve\n";
-    cout << " 5 - clamp_gamma\n\n";
+    cout << " 5 - clamp_gamma\n";
+    cout << " 6 - reinhard\n\n";
     cout << " 0 - EXIT\n\n";
     cout << " Enter your choice and press return: ";
     cin >> choice;
@@ -122,11 +123,14 @@ int main() {
         mapper += "-gmma" + ftm(gamma);
         i.apply_tone_mapper(select[choice-1], clamp, gamma);
       }
-    } else { //choice == 4
+    } else if (choice == 4) { //choice == 4
       cout << " [!] Enter Gamma Value: ";
       cin >> gamma;
       mapper = to_str(select[choice-1]) + "-gmma" + ftm(gamma);
       i.apply_tone_mapper(select[choice-1], 1, gamma);
+    } else {
+      mapper = "reinhard";
+      i.apply_reinhard_tmapper();
     }
 
 

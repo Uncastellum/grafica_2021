@@ -23,7 +23,7 @@ private:
   int width, height, res_color;
   float real_max;
   vector<RGB> cached;
-
+  const float PI = 3.1415926535;
 
 public:
   Image(string file){
@@ -109,6 +109,34 @@ public:
         cached[i].green = pow(cached[i].green, gamma_param);
         cached[i].blue = pow(cached[i].blue, gamma_param);
       }
+    }
+  }
+  /*void apply_reinhard_tmapper(float k_param = 1){
+    // apply_tone_mapper(equalization)
+    float max = 0;
+    for (size_t i = 0; i < width*height; i++) {
+      if (cached[i].red > max) max = cached[i].red;
+      if (cached[i].green > max) max = cached[i].green;
+      if (cached[i].blue > max) max = cached[i].blue;
+    }
+    /*for (size_t i = 0; i < width*height; i++) {
+      cached[i].red = cached[i].red/max;
+      cached[i].green = cached[i].green/max;
+      cached[i].blue = cached[i].blue/max;
+    }*/
+
+    // y = Asin(wt+phi) + y_desp
+    for (size_t i = 0; i < width*height; i++) {
+      cached[i].red    =  0.5*sin( PI/max * cached[i].red - PI/2) + 0.5;
+      cached[i].green  =  0.5*sin( PI/max * cached[i].green - PI/2) + 0.5;
+      cached[i].blue   =  0.5*sin( PI/max * cached[i].blue - PI/2) + 0.5;
+    }
+  }*/
+  void apply_reinhard_tmapper(float k_param = 1){
+    for (size_t i = 0; i < width*height; i++) {
+      cached[i].red    =  cached[i].red*k_param / (1 + cached[i].red*k_param);
+      cached[i].green  =  cached[i].green*k_param / (1 + cached[i].green*k_param);
+      cached[i].blue   =  cached[i].blue*k_param / (1 + cached[i].blue*k_param);
     }
   }
 
