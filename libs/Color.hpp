@@ -119,11 +119,7 @@ public:
       if (cached[i].green > max) max = cached[i].green;
       if (cached[i].blue > max) max = cached[i].blue;
     }
-    /*for (size_t i = 0; i < width*height; i++) {
-      cached[i].red = cached[i].red/max;
-      cached[i].green = cached[i].green/max;
-      cached[i].blue = cached[i].blue/max;
-    }*/
+    
 
     // y = Asin(wt+phi) + y_desp
     for (size_t i = 0; i < width*height; i++) {
