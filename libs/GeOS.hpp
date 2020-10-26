@@ -120,8 +120,6 @@ public:
 };
 
 
-
-
 double dotProduct(const VecPun& a, const VecPun& b) {
   if (a.isVector() && b.isVector()) {
     double res = a[xi]*b[xi] + a[yj]*b[yj] + a[zk]*b[zk];
@@ -132,8 +130,10 @@ double dotProduct(const VecPun& a, const VecPun& b) {
 }
 VecPun crossProduct(const VecPun& a, const VecPun& b) {
   if (a.isVector() && b.isVector()) {
-    VecPun res = VecPun(a[xi]*b[xi], a[yj]*b[yj], a[zk]*b[zk], false);
-    return res;
+    double i = a[yj]*b[zk] - a[zk]*b[yj],
+           j = a[zk]*b[xi] - a[xi]*b[zk],
+           k = a[xi]*b[yj] - a[yj]*b[xi];
+    return VecPun(i, j, k, false);
   } else {
     throw invalid_argument("Operation `crossProduct` is not defined for Points");
   }

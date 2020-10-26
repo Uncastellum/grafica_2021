@@ -6,6 +6,8 @@
 #include <cassert>
 #include <cmath>
 
+#include "GeOS.hpp"
+
 const int LEN = 4;
 enum matrix_type { traslate, scale, rotate };
 enum rotate_axis { x_axis, y_axis, z_axis };
@@ -85,6 +87,18 @@ public:
         break;
     }
   }
+  Matrix(const Direction& u, const Direction& v, const Direction& w, const Point& o) {
+    // Matrix ( u, v, w, o)
+    //        (u1,v1,w1,o1)
+    //        (u2,v2,w2,o2)
+    //        (u3,v3,w3,o3)
+    //        ( 0, 0, 0, 1)
+    m[0][0] = u[xi]; m[1][0] = u[yj]; m[2][0] = u[zk];
+    m[0][1] = v[xi]; m[1][1] = v[yj]; m[2][1] = v[zk];
+    m[0][2] = w[xi]; m[1][2] = w[yj]; m[2][2] = w[zk];
+    m[0][3] = o[xi]; m[1][3] = o[yj]; m[2][3] = o[zk];
+    m[3][0] = 0; m[3][1] = 0; m[3][2] = 0; m[3][3] = 1;
+  }
 
   bool isValid() const { return valid; }
 
@@ -128,6 +142,29 @@ public:
         res.m[i][j] = m[i][j] - b.m[i][j];
       }
     }
+    return res;
+  }
+
+  Direction operator*(const Direction& d) const {
+    Direction res;
+    for (int i = 0; i < LEN; i++) {
+      res.g[i] = 0;
+      for (int j = 0; j < LEN; j++){
+        res.g[i] += m[i][j]*d.g[j];
+      }
+    }
+    assert(res.isDirection());
+    return res;
+  }
+  Point operator*(const Point& p) const {
+    Point res;
+    for (int i = 0; i < LEN; i++) {
+      res.g[i] = 0;
+      for (int j = 0; j < LEN; j++){
+        res.g[i] += m[i][j]*p.g[j];
+      }
+    }
+    assert(res.isPoint());
     return res;
   }
 
@@ -184,3 +221,11 @@ public:
     return inv;
   }
 };
+
+
+void paint(Matrix m){
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j < 4; j++) printf("%.3f  ", m(i,j));
+    cout << endl;
+  }
+}
