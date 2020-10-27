@@ -120,7 +120,13 @@ public:
   }
 };
 
-
+class Object{
+public:
+  virtual bool intersection(const Direction& ray, const Point& origen, double &dist);
+};
+struct RGB {
+  float red, green, blue;
+};
 
 double dotProduct(const Direction& a, const Direction& b) {
   return a[xi]*b[xi] + a[yj]*b[yj] + a[zk]*b[zk];
