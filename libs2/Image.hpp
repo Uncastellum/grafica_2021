@@ -9,12 +9,12 @@
 #include <vector>
 #include <cmath>
 
-#include "GeOS.hpp" // RBG tuple
+#include "GeOS.hpp" // RGB tuple
+//#include "Sphere.hpp" //PI
 
 using namespace std;
 
 enum t_mapper { clamp, equalization, clamp_equaliz, gamma_curve, clamp_gamma };
-
 class Tone_Mapper;
 
 class Image {
@@ -23,10 +23,11 @@ private:
   int width, height, res_color;
   float real_max;
   vector<RGB> cached;
-  const float PI = 3.1415926535;
+  bool empty = false;
   friend class Tone_Mapper;
 
 public:
+  Image() : empty(true) {}
   Image(int width_, int height_) : width(width_), height(height_) {
     pSix = "P3";
     name = "# ppm file";
@@ -63,16 +64,19 @@ public:
   }
 
   RGB& operator()(unsigned row, unsigned col){ // matriz[][]
+    assert(!empty);
     assert(!(row >= width || col >= height));
     return cached[row*col + row];
   }
   RGB operator()(unsigned row, unsigned col) const {
+    assert(!empty);
     assert(!(row >= width || col >= height));
     return cached[row*col + row];
   }
 
 #pragma GCC optimize("O0")
   void exportLDR(string file){
+    assert(!empty);
     ofstream f(file);
     assert(f.is_open());
     f << pSix << endl;
@@ -111,40 +115,40 @@ public:
   void apply_tone_mapper(t_mapper map, float clamp_param = 1, float gamma_param = 1) {
     float clmp = map == clamp ? 1 : clamp_param;
     if (map == clamp || map == clamp_equaliz || map == clamp_gamma) {
-      for (size_t i = 0; i < i.width*i.height; i++) {
-        i.cached[i].red = i.cached[i].red > clmp ? 1 : i.cached[i].red;
-        i.cached[i].green = i.cached[i].green > clmp ? 1 : i.cached[i].green;
-        i.cached[i].blue = i.cached[i].blue > clmp ? 1 : i.cached[i].blue;
+      for (size_t it = 0; it < i.width*i.height; it++) {
+        i.cached[it].red = i.cached[it].red > clmp ? 1 : i.cached[it].red;
+        i.cached[it].green = i.cached[it].green > clmp ? 1 : i.cached[it].green;
+        i.cached[it].blue = i.cached[it].blue > clmp ? 1 : i.cached[it].blue;
       }
     }
 
     if (map == equalization || map == clamp_equaliz || map == gamma_curve || map == clamp_gamma) {
       float max = 0;
-      for (size_t i = 0; i < i.width*i.height; i++) {
-        if (i.cached[i].red > max) max = i.cached[i].red;
-        if (i.cached[i].green > max) max = i.cached[i].green;
-        if (i.cached[i].blue > max) max = i.cached[i].blue;
+      for (size_t it = 0; it < i.width*i.height; it++) {
+        if (i.cached[it].red > max) max = i.cached[it].red;
+        if (i.cached[it].green > max) max = i.cached[it].green;
+        if (i.cached[it].blue > max) max = i.cached[it].blue;
       }
-      for (size_t i = 0; i < i.width*i.height; i++) {
-        i.cached[i].red = i.cached[i].red/max;
-        i.cached[i].green = i.cached[i].green/max;
-        i.cached[i].blue = i.cached[i].blue/max;
+      for (size_t it = 0; it < i.width*i.height; it++) {
+        i.cached[it].red = i.cached[it].red/max;
+        i.cached[it].green = i.cached[it].green/max;
+        i.cached[it].blue = i.cached[it].blue/max;
       }
     }
 
     if (map == gamma_curve || map == clamp_gamma){
-      for (size_t i = 0; i < i.width*i.height; i++) {
-        i.cached[i].red = pow(i.cached[i].red, gamma_param);
-        i.cached[i].green = pow(i.cached[i].green, gamma_param);
-        i.cached[i].blue = pow(i.cached[i].blue, gamma_param);
+      for (size_t it = 0; it < i.width*i.height; it++) {
+        i.cached[it].red = pow(i.cached[it].red, gamma_param);
+        i.cached[it].green = pow(i.cached[it].green, gamma_param);
+        i.cached[it].blue = pow(i.cached[it].blue, gamma_param);
       }
     }
   }
   void apply_reinhard_tmapper(float k_param = 1){
-    for (size_t i = 0; i < i.width*i.height; i++) {
-      i.cached[i].red    =  i.cached[i].red*k_param / (1 + i.cached[i].red*k_param);
-      i.cached[i].green  =  i.cached[i].green*k_param / (1 + i.cached[i].green*k_param);
-      i.cached[i].blue   =  i.cached[i].blue*k_param / (1 + i.cached[i].blue*k_param);
+    for (size_t it = 0; it < i.width*i.height; it++) {
+      i.cached[it].red    =  i.cached[it].red*k_param / (1 + i.cached[it].red*k_param);
+      i.cached[it].green  =  i.cached[it].green*k_param / (1 + i.cached[it].green*k_param);
+      i.cached[it].blue   =  i.cached[it].blue*k_param / (1 + i.cached[it].blue*k_param);
     }
   }
 };
