@@ -79,12 +79,12 @@ public:
      for (int j = 0; j < y; j++) {
        Direction ray = (c.origen + c.f + (c.l*((x - i + 0.5)/x)) + (c.u*((y - j + 0.5)/y))) - c.origen;
        //cout<<i<<" "<<j<<endl;
-       paint(c.u*0.5);
-       double min_choque_dist=50;
+       //paint(c.u*0.5);
+       float min_choque_dist=50;
        int choques=0;
        RGB color;
        for (int k = 0; k < objs.size(); k++) {
-         double choque_dist;
+         float choque_dist;
          //min_choque_dist=50;
          if(objs[k]->intersection(ray, c.origen, choque_dist)){ //comprobamos interseccion
            choques++;
