@@ -67,10 +67,37 @@ public:
     objs.push_back(obj);
   }
   void exportImg(string file){
-    out_img.exportLDR(file);
+    out_img.exportRay(file);
   }
 
-  void RayTracing1rppx(const int x, const int y){
+  void RayTracing1rppx(int x, int y){
+   out_img = Image(x,y);
+   //#pragma omp parallel for schedule(dynamic,1)
+   for (int i = 0; i < x; i++) {
+     //#pragma omp parallel for schedule(dynamic,1)
+     for (int j = 0; j < y; j++) {
+       Direction ray = (c.origen + c.f + (c.l*(x-(i + 0.5)/x)) + (c.u*(y-(j + 0.5)/y))) - c.origen;
+       float min_choque_dist; double d;
+       int choques=0;
+       RGB color;
+       for (int k = 0; k < objs.size(); k++) {
+         float choque_dist;
+         if(objs[k]->intersection(ray, c.origen, d)){ //comprobamos interseccion
+           choques++;
+           if(choques==1||d<min_choque_dist){ //comprobamos distancia
+             min_choque_dist = choque_dist;
+             color = objs[k]->getSolid();
+             //cout<<objs[k]->getSolid().red<<endl;
+           }
+         }
+       }
+       if (choques == 0) color = RGB(0,0,0);
+       out_img(i,j) = color;
+     }
+   }
+ }
+
+  void RayTracing1rppx2(const int x, const int y){
     out_img = Image(x,y);
     //#pragma omp parallel for schedule(dynamic,1)
     for (int i = 0; i < x; i++) {
