@@ -34,9 +34,10 @@ public:
 
   Direction getRaypp(const int x, const int y, const int p_i, const int p_j) const {
     assert(!(p_i >= x || p_j >= y));
-    float c_x = 1 - 2/x*(p_i + 0.5),
-          c_y = 1 - 2/y*(p_j + 0.5);
-    return origen - (origen + u*c_y + l*c_x + f);
+    float c_x = 1.0 - 2.0/x*(p_i + 0.5),
+           c_y = 1.0 - 2.0/y*(p_j + 0.5);
+    printf("%.5f  ", c_x); printf("%.5f --- ", c_y);
+    return (origen + f + l*c_x + u*c_y) - origen;
   };
   Direction getRandomRaypp(const int x, const int y, const int p_i, const int p_j) const {
     assert(!(p_i >= x || p_j >= y));
@@ -102,12 +103,16 @@ public:
 
   void RayTracing1rppx2(const int x, const int y){
     out_img = Image(x,y);
+    Direction ray;
     //#pragma omp parallel for schedule(dynamic,1)
     for (int i = 0; i < x; i++) {
       //#pragma omp parallel for schedule(dynamic,1)
       for (int j = 0; j < y; j++) {
-        Direction ray = c.getRaypp(x,y,i,j);
-        double dist_obj = -1, d;
+        ray = c.getRaypp(x,y,i,j);
+        printf("( %.3f  ", ray.getxi()); cout << ", ";
+        printf("%.3f  ", ray.getyj()); cout << ", ";
+        printf("%.3f  ", ray.getzk()); cout << " ) - ";
+        float dist_obj = -1.0, d = 0.0;
         RGB color(189,189,189);
         shared_ptr<Object> p;
 
@@ -119,6 +124,7 @@ public:
             }
           }
         }
+        cout << dist_obj << ", " << d << endl;
 
         if (!dist_obj == -1) color = p->getSolid();
         out_img(i,j) = color;
