@@ -3,6 +3,12 @@
 #include <vector>
 #include <string>
 #include <memory>
+
+#include <cassert>
+#include <ctime>
+#include <cstdlib>
+
+
 #include "GeOS.hpp"
 #include "Image.hpp"
 //#include "Matrix.hpp"
@@ -20,10 +26,24 @@ private:
 
 public:
   Camera(Point c_, Direction u_, Direction l_, Direction f_) {
+    srand(time(NULL));
     origen = c_;
     u = u_.normalize(); l = l_.normalize();
     f = f_;
   }
+
+  Direction getRaypp(const int x, const int y, const int p_i, const int p_j) const {
+    assert(!(p_i >= x || p_j >= y));
+    float c_x = 1 - 2/x*(p_i + 0.5),
+          c_y = 1 - 2/y*(p_j + 0.5);
+    return origen - (origen + u*c_y + l*c_x + f);
+  };
+  Direction getRandomRaypp(const int x, const int y, const int p_i, const int p_j) const {
+    assert(!(p_i >= x || p_j >= y));
+    float c_x = 1 - 2/x*(p_i + ((float) rand() / (RAND_MAX)) ),
+          c_y = 1 - 2/y*(p_j + ((float) rand() / (RAND_MAX)) );
+    return origen - (origen + u*c_y + l*c_x + f);
+  };
 };
 
 
@@ -50,27 +70,27 @@ public:
     out_img.exportLDR(file);
   }
 
-  void RayTracing1rppx(int x, int y){
+  void RayTracing1rppx(const int x, const int y){
     out_img = Image(x,y);
     //#pragma omp parallel for schedule(dynamic,1)
     for (int i = 0; i < x; i++) {
       //#pragma omp parallel for schedule(dynamic,1)
       for (int j = 0; j < y; j++) {
-        Direction ray = (c.origen + c.f + (c.l*(x-(i + 0.5)/x)) + (c.u*(y-(j + 0.5)/y))) - c.origen;
-        float min_choque_dist; double d;
-        int choques=0;
-        RGB color;
+        Direction ray = c.getRaypp(x,y,i,j);
+        double dist_obj = -1, d;
+        RGB color(189,189,189);
+        shared_ptr<Object> p;
+
         for (int k = 0; k < objs.size(); k++) {
-          float choque_dist;
           if(objs[k]->intersection(ray, c.origen, d)){ //comprobamos interseccion
-            choques++;
-            if(choques==1||d<min_choque_dist){ //comprobamos distancia
-              min_choque_dist = choque_dist;
-              color = objs[k]->getSolid();
+            if (dist_obj == -1 || dist_obj > d) {
+              dist_obj = d;
+              p = objs[k];
             }
           }
         }
-        if (choques == 0) color = RGB(189,189,189);
+
+        if (!dist_obj == -1) color = p->getSolid();
         out_img(i,j) = color;
       }
     }

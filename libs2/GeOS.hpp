@@ -3,7 +3,6 @@
 //Compile test: g++ -std=c++11 -I. GeOS.hpp -O3 -o efe.o
 
 #include <iostream>
-#include <cassert>
 #include <cmath>
 
 using namespace std;
@@ -146,6 +145,10 @@ struct RGB {
   RGB(){}
   RGB(float r, float g, float b) : red(r), green(g), blue(b) {};
 };
+
+void print(RGB t){
+  cout << "(" << t.red << ", " << t.green << ", " << t.blue << ")";
+}
 
 class Object{
 protected:
