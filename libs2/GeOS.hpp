@@ -121,31 +121,6 @@ public:
 };
 
 
-struct RGB {
-  float red, green, blue;
-  RGB(){}
-  RGB(float r, float g, float b) : red(r), green(g), blue(b) {};
-};
-
-
-class Object{
-protected:
-  RGB solid_color;
-  Object(){};
-public:
-  virtual bool intersection(const Direction& ray, const Point& origen, double &dist);
-
-  void setRGB(RGB sc){
-    solid_color = sc;
-  }
-  RGB getSolid(){
-    return solid_color;
-  }
-};
-
-
-
-
 
 double dotProduct(const Direction& a, const Direction& b) {
   return a[xi]*b[xi] + a[yj]*b[yj] + a[zk]*b[zk];
@@ -164,3 +139,25 @@ void paint(GeomObj v){
   printf("%.3f  ", v.getType());
   cout << endl;
 }
+
+
+struct RGB {
+  float red, green, blue;
+  RGB(){}
+  RGB(float r, float g, float b) : red(r), green(g), blue(b) {};
+};
+
+class Object{
+protected:
+  RGB solid_color;
+  Object(){};
+public:
+  virtual bool intersection(const Direction& ray, const Point& origen, double &dist) = 0;
+
+  void setRGB(RGB sc){
+    solid_color = sc;
+  }
+  RGB getSolid(){
+    return solid_color;
+  }
+};

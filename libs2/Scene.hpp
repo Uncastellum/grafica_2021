@@ -43,7 +43,7 @@ public:
     return c;
   }
 
-  void addObj(shared_ptr<Object> obj) {
+  void addObj(const shared_ptr<Object>& obj) {
     objs.push_back(obj);
   }
   void exportImg(string file){
