@@ -66,7 +66,6 @@ public:
   RGB& operator()(unsigned row, unsigned col){ // matriz[][]
     assert(!empty);
     assert(!(row >= width || col >= height));
-    //cout<<row<<" "<<col<<" "<<row*height + col<<endl;
     return cached[row*height + col];
   }
   RGB operator()(unsigned row, unsigned col) const {
@@ -93,6 +92,22 @@ public:
       if(g > 255) g=255;
       if(b > 255) b=255;
       f << r << " " << g << " " << b << "     ";
+      if ((i%width)==width-1) f << endl;
+    }
+    f.close();
+  }
+
+  void exportRay(string file){
+    assert(!empty);
+    ofstream f(file);
+    assert(f.is_open());
+    f << pSix << endl;
+    f << "#MAX=1" << endl;
+    f << name << endl;
+    f << width << " " << height << endl;
+    f << 255 << endl;
+    for (int i = 0; i < width*height; i++) {
+      f << cached[i].red << " " << cached[i].green << " " << cached[i].blue << "     ";
       if ((i%width)==width-1) f << endl;
     }
     f.close();

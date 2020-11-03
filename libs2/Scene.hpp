@@ -47,7 +47,7 @@ public:
     objs.push_back(obj);
   }
   void exportImg(string file){
-    out_img.exportLDR(file);
+    out_img.exportRay(file);
   }
 
   void RayTracing1rppx(int x, int y){
@@ -70,7 +70,7 @@ public:
             }
           }
         }
-        if (choques == 0) color = RGB(189,189,189);
+        if (choques == 0) color = RGB(189,32,32);
         out_img(i,j) = color;
       }
     }

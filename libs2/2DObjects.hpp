@@ -32,6 +32,6 @@ public:
 
   // https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/ray-triangle-intersection-geometric-solution
   bool intersection(const Direction& ray, const Point& origen, double &dist) override {
-
+    return true;
   }
 };
