@@ -66,12 +66,13 @@ public:
   RGB& operator()(unsigned row, unsigned col){ // matriz[][]
     assert(!empty);
     assert(!(row >= width || col >= height));
-    return cached[row*col + row];
+    //cout<<row<<" "<<col<<" "<<row*height + col<<endl;
+    return cached[row*height + col];
   }
   RGB operator()(unsigned row, unsigned col) const {
     assert(!empty);
     assert(!(row >= width || col >= height));
-    return cached[row*col + row];
+    return cached[row*height + col];
   }
 
 #pragma GCC optimize("O0")
