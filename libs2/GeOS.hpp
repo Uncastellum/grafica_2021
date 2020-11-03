@@ -45,6 +45,8 @@ public:
         return g[1];
       case zk:
         return g[2];
+      default:
+        return -888;
     }
   }
   float getxi() const {
