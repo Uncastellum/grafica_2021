@@ -16,8 +16,8 @@ protected:
   GeomObj(){
     for (int i = 0; i < 4; i++) g[i] = 0;
   }
-  GeomObj(float xi, float yj, float zk){
-    g[0] = xi; g[1] = yj; g[2] = zk;
+  GeomObj(float x, float y, float z){
+    g[0] = x; g[1] = y; g[2] = z;
   }
   friend class Matrix;
 public:
@@ -61,14 +61,14 @@ public:
   float getType() const {
     return g[3];
   }
-  void setxi(int xi){
-    g[0] = xi;
+  void setxi(int in){
+    g[0] = in;
   }
-  void setyj(int yj){
-    g[1] = yj;
+  void setyj(int in){
+    g[1] = in;
   }
-  void setzk(int zk){
-    g[2] = zk;
+  void setzk(int in){
+    g[2] = in;
   }
 };
 

@@ -36,7 +36,7 @@ public:
     assert(!(p_i >= x || p_j >= y));
     float c_x = 1.0 - 2.0/x*(p_i + 0.5),
            c_y = 1.0 - 2.0/y*(p_j + 0.5);
-    printf("%.5f  ", c_x); printf("%.5f --- ", c_y);
+    //printf("%.5f  ", c_x); printf("%.5f --- ", c_y);
     return (origen + f + l*c_x + u*c_y) - origen;
   };
   Direction getRandomRaypp(const int x, const int y, const int p_i, const int p_j) const {
@@ -109,22 +109,22 @@ public:
       //#pragma omp parallel for schedule(dynamic,1)
       for (int j = 0; j < y; j++) {
         ray = c.getRaypp(x,y,i,j);
-        printf("( %.3f  ", ray.getxi()); cout << ", ";
-        printf("%.3f  ", ray.getyj()); cout << ", ";
-        printf("%.3f  ", ray.getzk()); cout << " ) - ";
-        float dist_obj = -1.0, d = 0.0;
+        //printf("( %.3f  ", ray.getxi()); cout << ", ";
+        //printf("%.3f  ", ray.getyj()); cout << ", ";
+        //printf("%.3f  ", ray.getzk()); cout << " ) - ";
+        float dist_obj = -1, d = 0;
         RGB color(189,189,189);
         shared_ptr<Object> p;
 
         for (int k = 0; k < objs.size(); k++) {
-          if(objs[k]->intersection(ray, c.origen, d)){ //comprobamos interseccion
+          if( objs[k]->intersection(ray, c.origen, d) ){ //comprobamos interseccion
             if (dist_obj == -1 || dist_obj > d) {
               dist_obj = d;
               p = objs[k];
             }
           }
         }
-        cout << dist_obj << ", " << d << endl;
+        cout << dist_obj << ", " << d << ", "; print(p->getSolid()); cout << endl;
 
         if (!dist_obj == -1) color = p->getSolid();
         out_img(i,j) = color;
