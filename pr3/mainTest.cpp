@@ -29,6 +29,6 @@ int main(){
   scn.addObj(zneg);
 
   scn.RayTracing1rppx(1024, 768);
-  scn.exportImg("loqsea.bmp");
+  scn.exportImg("loqsea.ppm");
 
 }
