@@ -90,6 +90,9 @@ public:
   Direction operator*(float escalar) const {
     return Direction(g[0]*escalar, g[1]*escalar, g[2]*escalar);
   }
+  Direction operator/(float escalar) const {
+    return Direction(g[0]/escalar, g[1]/escalar, g[2]/escalar);
+  }
   float modulus() const {
     return sqrt( g[0]*g[0] + g[1]*g[1] + g[2]*g[2]);
   }

@@ -34,9 +34,10 @@ public:
 
   Direction getRaypp(const int x, const int y, const int p_i, const int p_j) const {
     assert(!(p_i >= x || p_j >= y));
-    float c_x = 1.0 - 2.0/x*(p_i + 0.5),
-           c_y = 1.0 - 2.0/y*(p_j + 0.5);
-    return (origen + f + u*c_x + l*c_y) - origen;
+    int max = (x > y) ? x : y;
+    float c_x = x - 2.0*(p_i + 0.5),
+           c_y = y - 2.0*(p_j + 0.5);
+    return f + u*(c_y/max) + l*(c_x/max);
   };
   Direction getRandomRaypp(const int x, const int y, const int p_i, const int p_j) const {
     assert(!(p_i >= x || p_j >= y));
@@ -94,7 +95,7 @@ public:
          }
        }
        if (choques == 0) color = RGB(0,0,0);
-       out_img(i,j) = color;
+       out_img(j,i) = color;
      }
    }
  }

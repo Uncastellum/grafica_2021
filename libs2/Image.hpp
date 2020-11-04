@@ -63,15 +63,15 @@ public:
     f.close();
   }
 
-  RGB& operator()(unsigned row, unsigned col){ // matriz[][]
+  RGB& operator()(unsigned x, unsigned y){ // matriz[][]
     assert(!empty);
-    assert(!(row >= height || col >= width));
-    return cached[row*width + col];
+    assert(!(x >= width || y >= height));
+    return cached[y*width + x];
   }
-  RGB operator()(unsigned row, unsigned col) const {
+  RGB operator()(unsigned x, unsigned y) const {
     assert(!empty);
-    assert(!(row >= height || col >= width));
-    return cached[row*width + col];
+    assert(!(x >= width || y >= height));
+    return cached[y*width + x];
   }
 
 #pragma GCC optimize("O0")

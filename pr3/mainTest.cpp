@@ -15,7 +15,7 @@ int main(){
   unsigned t0, t1;
   double read_time;
 
-  Camera c(Point(0, 0, 0), Direction(0,0,1), Direction(0,1,0), Direction(0.7,0,0));
+  Camera c(Point(-3, 0, 0), Direction(0,0,1), Direction(0,1,0), Direction(0.7,0,0));
 
   Scene scn(c);
   shared_ptr<Object> pared_fr ( new Plane(Point(5,0,0), Direction(1,0,0)) );    pared_fr ->setRGB(RGB(255, 20, 20));
@@ -31,7 +31,7 @@ int main(){
   scn.addObj(pared_do);
 
   t0 = clock();
-  scn.RayTracing1rppx(400, 400);
+  scn.RayTracing1rppx(800, 1000);
   t1 = clock();
   read_time = (double(t1-t0)/CLOCKS_PER_SEC);
   cout << "RT_v1: " << read_time << " segundos" << endl;
