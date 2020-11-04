@@ -119,6 +119,9 @@ public:
   Point operator+(const Direction& other) const {
     return Point(g[0] + other[xi], g[1] + other[yj], g[2] + other[zk]);
   }
+  Direction to_dir() const {
+    return Direction(g[0],g[1],g[2]);
+  }
 };
 
 
@@ -134,11 +137,20 @@ Direction crossProduct(const Direction& a, const Direction& b) {
 }
 
 void paint(GeomObj v){
+  switch ((int) v.getType()) {
+    case 0:
+      printf("d(");
+      break;
+    case 1:
+      printf("p(");
+      break;
+    default:
+      printf("Unknown(");
+      break;
+  }
   printf("%.3f  ", v.getxi());
   printf("%.3f  ", v.getyj());
-  printf("%.3f  ", v.getzk());
-  printf("%.3f  ", v.getType());
-  cout << endl;
+  printf("%.3f)", v.getzk());
 }
 
 
@@ -148,7 +160,7 @@ struct RGB {
   RGB(float r, float g, float b) : red(r), green(g), blue(b) {};
 };
 
-void print(RGB t){
+void paint(RGB t){
   cout << "(" << t.red << ", " << t.green << ", " << t.blue << ")";
 }
 

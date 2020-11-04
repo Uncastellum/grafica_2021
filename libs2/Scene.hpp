@@ -43,7 +43,7 @@ public:
     assert(!(p_i >= x || p_j >= y));
     float c_x = 1 - 2/x*(p_i + ((float) rand() / (RAND_MAX)) ),
           c_y = 1 - 2/y*(p_j + ((float) rand() / (RAND_MAX)) );
-    return origen - (origen + u*c_y + l*c_x + f);
+    return (origen + f + l*c_x + u*c_y) - origen;
   };
 };
 
@@ -109,24 +109,20 @@ public:
       //#pragma omp parallel for schedule(dynamic,1)
       for (int j = 0; j < y; j++) {
         ray = c.getRaypp(x,y,i,j);
-        //printf("( %.3f  ", ray.getxi()); cout << ", ";
-        //printf("%.3f  ", ray.getyj()); cout << ", ";
-        //printf("%.3f  ", ray.getzk()); cout << " ) - ";
         float dist_obj = -1, d = 0;
-        RGB color(189,189,189);
+        RGB color(64,64,64);
         shared_ptr<Object> p;
 
         for (int k = 0; k < objs.size(); k++) {
           if( objs[k]->intersection(ray, c.origen, d) ){ //comprobamos interseccion
             if (dist_obj == -1 || dist_obj > d) {
               dist_obj = d;
+              color = objs[k]->getSolid();
               p = objs[k];
             }
           }
         }
-        cout << dist_obj << ", " << d << ", "; print(p->getSolid()); cout << endl;
 
-        if (!dist_obj == -1) color = p->getSolid();
         out_img(i,j) = color;
       }
     }
