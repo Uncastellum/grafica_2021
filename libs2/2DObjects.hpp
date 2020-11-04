@@ -15,7 +15,7 @@ public:
   // https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-plane-and-ray-disk-intersection
   bool intersection(const Direction& ray, const Point& origen, float &dist) override {
     float denom = dotProduct(normal, ray);
-    if (denom > 1e-6) {
+    if (fabs(denom) > 1e-6 ) {
         Direction p_orig = p - origen;
         float t = dotProduct(p_orig, normal) / denom;
         dist = t*ray.modulus();
