@@ -81,15 +81,13 @@ public:
        Direction aux_u = c.u * (1.0/(y/2));
        Direction ray = (c.origen + c.f + (aux_l * ((x/2)-(j+1))) + aux_l*0.5 + (aux_u * ((y/2)-(i+1))) + aux_u*0.5 ) - c.origen;
        //paint(ray);
-       float min_choque_dist=50;
+       float min_choque_dist;
        int choques=0;
        RGB color;
        for (int k = 0; k < objs.size(); k++) {
          float choque_dist;
-         //min_choque_dist=50;
          if(objs[k]->intersection(ray, c.origen, choque_dist)){ //comprobamos interseccion
            choques++;
-           //cout<<choque_dist<<endl;
            if(choques==1||choque_dist<min_choque_dist){ //comprobamos distancia
              min_choque_dist = choque_dist;
              color = objs[k]->getSolid();
