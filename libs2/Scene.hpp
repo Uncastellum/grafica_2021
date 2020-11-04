@@ -36,8 +36,7 @@ public:
     assert(!(p_i >= x || p_j >= y));
     float c_x = 1.0 - 2.0/x*(p_i + 0.5),
            c_y = 1.0 - 2.0/y*(p_j + 0.5);
-    //printf("%.5f  ", c_x); printf("%.5f --- ", c_y);
-    return (origen + f + l*c_x + u*c_y) - origen;
+    return (origen + f + u*c_x + l*c_y) - origen;
   };
   Direction getRandomRaypp(const int x, const int y, const int p_i, const int p_j) const {
     assert(!(p_i >= x || p_j >= y));
@@ -80,7 +79,6 @@ public:
        Direction aux_l = c.l * (1.0/(x/2));
        Direction aux_u = c.u * (1.0/(y/2));
        Direction ray = (c.origen + c.f + (aux_l * ((x/2)-(j+1))) + aux_l*0.5 + (aux_u * ((y/2)-(i+1))) + aux_u*0.5 ) - c.origen;
-       //paint(ray);
        float min_choque_dist=50;
        int choques=0;
        RGB color;
@@ -112,14 +110,12 @@ public:
         ray = c.getRaypp(x,y,i,j);
         float dist_obj = -1, d = 0;
         RGB color(64,64,64);
-        shared_ptr<Object> p;
 
         for (int k = 0; k < objs.size(); k++) {
           if( objs[k]->intersection(ray, c.origen, d) ){ //comprobamos interseccion
             if (dist_obj == -1 || dist_obj > d) {
               dist_obj = d;
               color = objs[k]->getSolid();
-              p = objs[k];
             }
           }
         }
