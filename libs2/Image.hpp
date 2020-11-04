@@ -65,13 +65,13 @@ public:
 
   RGB& operator()(unsigned row, unsigned col){ // matriz[][]
     assert(!empty);
-    assert(!(row >= width || col >= height));
-    return cached[row*height + col];
+    assert(!(row >= height || col >= width));
+    return cached[row*width + col];
   }
   RGB operator()(unsigned row, unsigned col) const {
     assert(!empty);
-    assert(!(row >= width || col >= height));
-    return cached[row*height + col];
+    assert(!(row >= height || col >= width));
+    return cached[row*width + col];
   }
 
 #pragma GCC optimize("O0")

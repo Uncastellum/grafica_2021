@@ -29,7 +29,15 @@ int main(){
   scn.addObj(pared_up);
   scn.addObj(pared_do);
 
-  scn.RayTracing1rppx(400, 400);
+  unsigned t0, t1;
+  double read_time;
+
+  t0 = clock();
+
+  scn.RayTracing1rppx(40,80);
   scn.exportImg("loqsea.ppm");
 
+  t1 = clock();
+  read_time = (double(t1-t0)/CLOCKS_PER_SEC);
+  cout << "Tiempo: " << read_time << " segundos" << endl;
 }
