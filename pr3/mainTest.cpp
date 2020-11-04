@@ -37,7 +37,7 @@ int main(){
   cout << "RT_v1: " << read_time << " segundos" << endl;
 
   /*t0 = clock();
-  scn.RayTracing1rppx2(400, 400);
+  scn.RayTracing1rppx2(800, 1000);
   t1 = clock();
   read_time = (double(t1-t0)/CLOCKS_PER_SEC);
   cout << "RT_v2: " << read_time << " segundos" << endl;*/
