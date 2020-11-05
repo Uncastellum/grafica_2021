@@ -7,7 +7,7 @@
 #include "2DObjects.hpp"
 #include "GeOS.hpp"
 
-//g++ -std=c++11 -I ../libs2 mainTest.cpp -O3 -o main
+//g++ -std=c++11 -I ../libs2 mainTest.cpp -O3 -fopenmp -o main
 
 using namespace std;
 

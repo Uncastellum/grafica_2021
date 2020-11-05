@@ -73,12 +73,12 @@ public:
 
   void RayTracing1rppx(int x, int y){
    out_img = Image(x,y);
-   //#pragma omp parallel for schedule(dynamic,1)
+   Direction aux_l = c.l * (1.0/(x/2));
+   Direction aux_u = c.u * (1.0/(x/2));
+   #pragma omp parallel for schedule(dynamic,1)
    for (int i = 0; i < y; i++) {
-     //#pragma omp parallel for schedule(dynamic,1)
+     #pragma omp parallel for schedule(dynamic,1)
      for (int j = 0; j < x; j++) {
-       Direction aux_l = c.l * (1.0/(x/2));
-       Direction aux_u = c.u * (1.0/(x/2));
        Direction ray = (c.origen + c.f + (aux_l * ((x/2)-(j+1))) + aux_l*0.5 + (aux_u * ((y/2)-(i+1))) + aux_u*0.5 ) - c.origen;
        //paint(ray);
        float min_choque_dist;
