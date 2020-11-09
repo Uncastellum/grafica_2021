@@ -7,6 +7,7 @@
 #include "2DObjects.hpp"
 #include "3DObjects.hpp"
 #include "GeOS.hpp"
+#include "PLYObject.hpp"
 
 //g++ -std=c++11 -I ../libs2 mainTest.cpp -O3 -fopenmp -o main
 
@@ -35,9 +36,11 @@ int main(){
   shared_ptr<Object> pelota3 ( new Pelota(Point(2.2,-3,0), 1) );  pelota3 ->setRGB(RGB(173, 69, 31));
 
   shared_ptr<Object> fp ( new FinitePlane(Point(0,1,1), Direction(0,0.5,0), Direction(0,0,0.5)) );    fp ->setRGB(RGB(64, 64, 64));
-  scn.addObj(fp);
 
-  scn.addObj(pared_fr);
+  shared_ptr<Object> ico ( new PLYObject("icosahedron.ply") );
+  scn.addObj(ico);
+
+  /*scn.addObj(pared_fr);
   scn.addObj(pared_iz);
   scn.addObj(pared_de);
   scn.addObj(pared_up);
@@ -49,6 +52,8 @@ int main(){
   scn.addObj(pelota2);
   scn.addObj(pelota22);
   scn.addObj(pelota3);
+  scn.addObj(fp);
+  */
 
   /*
   t0 = clock();
