@@ -83,13 +83,16 @@ public:
       if( obj[k].intersection(r, t0, d) ){ //comprobamos interseccion
         if (dist == -1 || dist > d) {
           dist = d; t = t0;
-          //solid_color = obj[k].getSolid();
-          setRGB(obj[k].getSolid());
+          solid_color = obj[k].getSolid();
         }
       }
     }
 
-    paint(solid_color); cout << ".   " << t << ", "<< dist<< endl;
+    if(dist > 0) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
 };
