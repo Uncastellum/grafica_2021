@@ -156,11 +156,17 @@ void paint(GeomObj v){
   printf("%.3f)", v.getzk());
 }
 
+struct Ray {
+  Point orig;
+  Direction dir;
+  Ray(){}
+  Ray(Point o, Direction d) : orig(o), dir(d) {}
+};
 
 struct RGB {
   float red, green, blue;
   RGB(){}
-  RGB(float r, float g, float b) : red(r), green(g), blue(b) {};
+  RGB(float r, float g, float b) : red(r), green(g), blue(b) {}
 };
 
 void paint(RGB t){
@@ -172,7 +178,7 @@ protected:
   RGB solid_color;
   Object(){};
 public:
-  virtual bool intersection(const Direction& ray, const Point& origen, float &dist) = 0;
+  virtual bool intersection(const Ray& r, float &t, float &dist) = 0;
 
   void setRGB(RGB sc){
     solid_color = sc;

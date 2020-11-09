@@ -5,6 +5,7 @@
 
 #include "Scene.hpp"
 #include "2DObjects.hpp"
+#include "3DObjects.hpp"
 #include "GeOS.hpp"
 
 //g++ -std=c++11 -I ../libs2 mainTest.cpp -O3 -fopenmp -o main
@@ -33,6 +34,9 @@ int main(){
   shared_ptr<Object> pelota22 ( new Pelota(Point(4.2,1,3), 1) );  pelota22 ->setRGB(RGB(94, 133, 106));
   shared_ptr<Object> pelota3 ( new Pelota(Point(2.2,-3,0), 1) );  pelota3 ->setRGB(RGB(173, 69, 31));
 
+  shared_ptr<Object> fp ( new FinitePlane(Point(-1,0,0), Direction(0,0.5,0), Direction(0,0,0.5)) );    fp ->setRGB(RGB(64, 64, 64));
+  scn.addObj(fp);
+
   scn.addObj(pared_fr);
   scn.addObj(pared_iz);
   scn.addObj(pared_de);
@@ -46,19 +50,26 @@ int main(){
   scn.addObj(pelota22);
   scn.addObj(pelota3);
 
+  /*
   t0 = clock();
   scn.RayTracing1rppx(800, 800);
   t1 = clock();
   read_time = (double(t1-t0)/CLOCKS_PER_SEC);
-  cout << "RT_v1: " << read_time << " segundos" << endl;
+  cout << "RT1rppx_v1: " << read_time << " segundos" << endl;
 
   /*
   t0 = clock();
   scn.RayTracing1rppx2(800, 800);
   t1 = clock();
   read_time = (double(t1-t0)/CLOCKS_PER_SEC);
-  cout << "RT_v2: " << read_time << " segundos" << endl;
+  cout << "RT1rppx_v2: " << read_time << " segundos" << endl;
   */
+
+  t0 = clock();
+  scn.RayTracing(800, 800, 50);
+  t1 = clock();
+  read_time = (double(t1-t0)/CLOCKS_PER_SEC);
+  cout << "RT: " << read_time << " segundos" << endl;
 
   t0 = clock();
   scn.exportImg("loqsea.bpm");

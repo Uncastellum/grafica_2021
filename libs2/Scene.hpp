@@ -32,18 +32,19 @@ public:
     f = f_;
   }
 
-  Direction getRaypp(const int x, const int y, const int p_i, const int p_j) const {
-    assert(!(p_i >= x || p_j >= y));
+  Ray getRaypp(const int x, const int y, const int p_i, const int p_j) const {
+    //assert(!(p_i >= x || p_j >= y));
     int max = (x > y) ? x : y;
     float c_x = x - 2.0*(p_i + 0.5),
            c_y = y - 2.0*(p_j + 0.5);
-    return f + u*(c_y/max) + l*(c_x/max);
+    return Ray(origen, f + u*(c_y/max) + l*(c_x/max));
   };
-  Direction getRandomRaypp(const int x, const int y, const int p_i, const int p_j) const {
-    assert(!(p_i >= x || p_j >= y));
-    float c_x = 1 - 2/x*(p_i + ((float) rand() / (RAND_MAX)) ),
-          c_y = 1 - 2/y*(p_j + ((float) rand() / (RAND_MAX)) );
-    return (origen + f + l*c_x + u*c_y) - origen;
+  Ray getRandomRaypp(const int x, const int y, const int p_i, const int p_j) const {
+    //assert(!(p_i >= x || p_j >= y));
+    int max = (x > y) ? x : y;
+    float c_x = x - 2.0*(p_i + ((float) rand() / (RAND_MAX))),
+          c_y = y - 2.0*(p_j + ((float) rand() / (RAND_MAX)));
+    return Ray(origen, f + u*(c_y/max) + l*(c_x/max));
   };
 };
 
@@ -82,11 +83,11 @@ public:
      for (int j = 0; j < x; j++) {
        Direction ray = (c.origen + c.f + (aux_l * ((x/2)-(j+1))) + aux_l*0.5 + (aux_u * ((y/2)-(i+1))) + aux_u*0.5 ) - c.origen;
        //paint(ray);
-       float min_choque_dist,choque_dist;
+       float min_choque_dist, choque_dist, t;
        int choques=0;
        RGB color;
        for (int k = 0; k < objs.size(); k++) {
-         if(objs[k]->intersection(ray, c.origen, choque_dist)){ //comprobamos interseccion
+         if(objs[k]->intersection(Ray(c.origen, ray), t, choque_dist)){ //comprobamos interseccion
            choques++;
            if(choques==1||choque_dist<min_choque_dist){ //comprobamos distancia
              min_choque_dist = choque_dist;
@@ -102,17 +103,17 @@ public:
 
   void RayTracing1rppx2(const int x, const int y){
     out_img = Image(x,y);
-    Direction ray;
+    Ray ray;
     //#pragma omp parallel for schedule(dynamic,1)
     for (int i = 0; i < x; i++) {
       //#pragma omp parallel for schedule(dynamic,1)
       for (int j = 0; j < y; j++) {
         ray = c.getRaypp(x,y,i,j);
-        float dist_obj = -1, d = 0;
+        float dist_obj = -1, d = 0, t;
         RGB color(64,64,64);
 
         for (int k = 0; k < objs.size(); k++) {
-          if( objs[k]->intersection(ray, c.origen, d) ){ //comprobamos interseccion
+          if( objs[k]->intersection(ray, t, d) ){ //comprobamos interseccion
             if (dist_obj == -1 || dist_obj > d) {
               dist_obj = d;
               color = objs[k]->getSolid();
@@ -121,6 +122,41 @@ public:
         }
 
         out_img(i,j) = color;
+      }
+    }
+  }
+
+  void RayTracing(const int x, const int y, const int rppx){
+    out_img = Image(x,y);
+
+    #pragma omp parallel for schedule(guided,1)
+    for (int i = 0; i < x; i++) {
+
+      #pragma omp parallel for schedule(guided,1)
+      for (int j = 0; j < y; j++) {
+
+        RGB media(0,0,0);
+        for(int nray = 0; nray < rppx; nray++){
+
+          Ray ray = c.getRandomRaypp(x,y,i,j);
+          float dist_obj = -1, d = 0, t;
+          RGB color(64,64,64);
+
+          for (int k = 0; k < objs.size(); k++) {
+            if( objs[k]->intersection(ray, t, d) ){ //comprobamos interseccion
+              if (dist_obj == -1 || dist_obj > d) {
+                dist_obj = d;
+                color = objs[k]->getSolid();
+              }
+            }
+          }
+
+          media.red += color.red/rppx;
+          media.green += color.green/rppx;
+          media.blue += color.blue/rppx;
+        }
+
+        out_img(i,j) = media;
       }
     }
   }

@@ -41,9 +41,9 @@ public:
     ifstream f(file);
     assert(f.is_open());
 
-    getline(f, pSix);
-    getline(f, max_comm);
-    getline(f, name);
+    getline(f, pSix);       assert(pSix == "P3");
+    getline(f, max_comm);   assert(max_comm[0] == '#');
+    getline(f, name);       assert(name[0] == '#');
     f >> width;
     f >> height;
     f >> res_color;
