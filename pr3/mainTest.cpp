@@ -34,7 +34,7 @@ int main(){
   shared_ptr<Object> pelota22 ( new Pelota(Point(4.2,1,3), 1) );  pelota22 ->setRGB(RGB(94, 133, 106));
   shared_ptr<Object> pelota3 ( new Pelota(Point(2.2,-3,0), 1) );  pelota3 ->setRGB(RGB(173, 69, 31));
 
-  shared_ptr<Object> fp ( new FinitePlane(Point(-1,0,0), Direction(0,0.5,0), Direction(0,0,0.5)) );    fp ->setRGB(RGB(64, 64, 64));
+  shared_ptr<Object> fp ( new FinitePlane(Point(0,1,1), Direction(0,0.5,0), Direction(0,0,0.5)) );    fp ->setRGB(RGB(64, 64, 64));
   scn.addObj(fp);
 
   scn.addObj(pared_fr);

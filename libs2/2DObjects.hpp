@@ -49,6 +49,17 @@ public:
       Direction auxv1 = inter - p;
       Direction auxv2 = auxv1;
 
+      // DENTRO DEL RECTANGULO??? CODIGO SIMPLIFICADO
+      double cosv1 = dotProduct(v1, auxv1);
+      double cosv2 = dotProduct(v2, auxv2);
+      if (cosv1 < v1mod && cosv1 > -v1mod) {
+        if (cosv2 < v2mod && cosv2 > -v2mod) {
+          return true;
+        }
+      }
+      return false;
+
+      /* DEMOSTRACION MATEMATICA, NO BORRAR
       double cosv1 = dotProduct(v1, auxv1) / (v1mod*auxv1.modulus());
       auxv1 = auxv1*cosv1;
       double cosv2 = dotProduct(v2, auxv2) / (v2mod*auxv2.modulus());
@@ -57,7 +68,7 @@ public:
       float v1test = fabs(auxv1.modulus() / v1mod);
       float v2test = fabs(auxv2.modulus() / v2mod);
       if (v1test > 1.0  || v2test > 1.0) return false;
-      else return true;
+      else return true;*/
     }
     return false;
   }
