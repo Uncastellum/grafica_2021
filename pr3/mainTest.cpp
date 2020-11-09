@@ -57,19 +57,19 @@ int main(){
   read_time = (double(t1-t0)/CLOCKS_PER_SEC);
   cout << "RT1rppx_v1: " << read_time << " segundos" << endl;
 
-  /*
+  */
   t0 = clock();
   scn.RayTracing1rppx2(800, 800);
   t1 = clock();
   read_time = (double(t1-t0)/CLOCKS_PER_SEC);
   cout << "RT1rppx_v2: " << read_time << " segundos" << endl;
-  */
 
-  t0 = clock();
+
+  /*t0 = clock();
   scn.RayTracing(800, 800, 50);
   t1 = clock();
   read_time = (double(t1-t0)/CLOCKS_PER_SEC);
-  cout << "RT: " << read_time << " segundos" << endl;
+  cout << "RT: " << read_time << " segundos" << endl;*/
 
   t0 = clock();
   scn.exportImg("loqsea.bpm");

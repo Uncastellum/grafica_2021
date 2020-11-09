@@ -1,6 +1,10 @@
 #pragma once
 
 #include "GeOS.hpp"
+#include <cmath>
+
+#include <iostream>
+using namespace std;
 
 // g++ -std=c++11 -I. 2DObjects.hpp -O3 -o efe.o
 
@@ -8,6 +12,7 @@ class Plane : public Object {
 protected:
   Point p;
   Direction normal;
+  Plane(){}
 
 public:
   Plane(Point dist, Direction norm) : p(dist), normal(norm) {}
@@ -28,31 +33,33 @@ public:
 class FinitePlane : public Plane {
 private:
   Direction v1,v2;
+  float v1mod, v2mod;
+
 public:
   FinitePlane(Point dist, Direction v1_, Direction v2_) :
-    v1(v1_), v2(v2_), Plane(dist, crossProduct(v1,v2).normalize()) {}
+    v1(v1_), v2(v2_) {
+      p = dist;
+      normal = crossProduct(v2,v1).normalize();
+      v1mod = v1.modulus(); v2mod = v2.modulus();
+    }
 
   bool intersection(const Ray& r, float &t, float &dist) override {
     if(Plane::intersection(r,t,dist)){
       Point inter = r.orig + r.dir*t;
-      float v1test = invdiv(inter - p, v1);
-      float v2test = invdiv(inter - p, v2);
-      if (v1test > 1.0 || v2test > 1.0) return false;
+      Direction auxv1 = inter - p;
+      Direction auxv2 = auxv1;
+
+      double cosv1 = dotProduct(v1, auxv1) / (v1mod*auxv1.modulus());
+      auxv1 = auxv1*cosv1;
+      double cosv2 = dotProduct(v2, auxv2) / (v2mod*auxv2.modulus());
+      auxv2 = auxv2*cosv2;
+
+      float v1test = fabs(auxv1.modulus() / v1mod);
+      float v2test = fabs(auxv2.modulus() / v2mod);
+      if (v1test > 1.0  || v2test > 1.0) return false;
       else return true;
     }
     return false;
-  }
-
-  float invdiv(Direction a, Direction b){
-    if(b[xi] != 0){
-      return a[xi] / b[xi];
-    } else if(b[yj] != 0) {
-      return a[yj] / b[yj];
-    } else if(b[zk] != 0) {
-      return a[zk] / b[zk];
-    } else {
-      return 1.0;
-    }
   }
 };
 
