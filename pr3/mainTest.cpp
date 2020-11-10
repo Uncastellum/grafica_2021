@@ -37,7 +37,7 @@ int main(){
 
   shared_ptr<Object> fp ( new FinitePlane(Point(0,1,1), Direction(0,0.5,0), Direction(0,0,0.5)) );    fp ->setRGB(RGB(64, 64, 64));
 
-  shared_ptr<Object> ico ( new PLYObject("icosahedron.ply") );
+  shared_ptr<Object> ico ( new PLYObject("dodecahedron.ply") );
   scn.addObj(ico);
 
   /*scn.addObj(pared_fr);

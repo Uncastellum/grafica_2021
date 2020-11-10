@@ -122,6 +122,12 @@ public:
   Point operator+(const Direction& other) const {
     return Point(g[0] + other[xi], g[1] + other[yj], g[2] + other[zk]);
   }
+  Point operator*(float escalar) const {
+    return Point(g[0]*escalar, g[1]*escalar, g[2]*escalar);
+  }
+  Point operator/(float escalar) const {
+    return Point(g[0]/escalar, g[1]/escalar, g[2]/escalar);
+  }
   Direction to_dir() const {
     return Direction(g[0],g[1],g[2]);
   }
