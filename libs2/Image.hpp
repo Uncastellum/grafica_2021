@@ -1,6 +1,6 @@
 #pragma once
 
-//Compile test: g++ -std=c++11 -I. Color.hpp -O3 -o efe.o
+//Compile test: g++ -std=c++11 -I. Image.hpp -O3 -o efe.o
 
 #include <iostream>
 #include <cassert>
@@ -10,8 +10,7 @@
 #include <cmath>
 #include <cstring>
 
-#include "GeOS.hpp" // RGB tuple
-//#include "Sphere.hpp" //PI
+#include "BasicsRender.hpp"
 
 using namespace std;
 

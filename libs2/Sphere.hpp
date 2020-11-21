@@ -9,13 +9,6 @@
 
 using namespace std;
 
-#define PI 3.1415926535
-#define RAD_DEG270 PI*3/2
-#define RAD_DEG180 PI/1
-#define RAD_DEG90 PI/2
-#define RAD_DEG45 PI/4
-#define RAD_DEG30 PI/6
-
 // MINI PARCHE ANTI COMPILADOR
 class Sphere;
 class SpherePoint;

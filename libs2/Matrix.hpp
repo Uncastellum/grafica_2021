@@ -12,9 +12,16 @@ const int LEN = 4;
 enum matrix_type { traslate, scale, rotate };
 enum rotate_axis { x_axis, y_axis, z_axis };
 
+#define PI 3.1415926535
+#define RAD_DEG270 PI*3/2
+#define RAD_DEG180 PI/1
+#define RAD_DEG90 PI/2
+#define RAD_DEG45 PI/4
+#define RAD_DEG30 PI/6
+
 class Matrix {
 private:
-  double m[LEN][LEN];
+  float m[LEN][LEN];
   bool valid;
 
 public:
@@ -22,13 +29,13 @@ public:
     for (int i = 0; i < LEN; i++) for (int j = 0; j < LEN; j++) m[i][j] = 0;
     valid = true;
   }
-  Matrix(double matrix[LEN][LEN]){
+  Matrix(float matrix[LEN][LEN]){
     for (int i = 0; i < LEN; i++) for (int j = 0; j < LEN; j++) m[i][j] = matrix[i][j];
     valid = true;
   }
   // Matrix(translate,1,2,3)
   // Matrix(rotate,1,2,3,axis_y)
-  Matrix(matrix_type type, double tx, double ty, double tz){
+  Matrix(matrix_type type, float tx, float ty, float tz){
     assert(matrix_type::traslate == type || matrix_type::scale == type);
     valid = true;
     //static_assert( (matrix_type::traslate == type || matrix_type::scale == type),
@@ -54,7 +61,9 @@ public:
     }
   }
 
-  Matrix(matrix_type type, rotate_axis rt, double angle){
+  Matrix(matrix_type type, rotate_axis rt, float angle, bool inDegree = true){
+    float r_angle = angle;
+    if (inDegree) r_angle = r_angle/180*PI;
     assert(matrix_type::rotate == type);
     valid = true;
     //static_assert( (matrix_type::rotate != type),
@@ -66,22 +75,22 @@ public:
     m[3][3] = 1;
     switch (rt) {
       case x_axis:
-        m[1][1] = cos(angle);
-        m[1][2] = -sin(angle);
-        m[2][1] = sin(angle);
-        m[2][2] = cos(angle);
+        m[1][1] = cos(r_angle);
+        m[1][2] = -sin(r_angle);
+        m[2][1] = sin(r_angle);
+        m[2][2] = cos(r_angle);
         break;
       case y_axis:
-        m[0][0] = cos(angle);
-        m[0][2] = -sin(angle);
-        m[2][0]= sin(angle);
-        m[2][2] = cos(angle);
+        m[0][0] = cos(r_angle);
+        m[0][2] = -sin(r_angle);
+        m[2][0]= sin(r_angle);
+        m[2][2] = cos(r_angle);
         break;
       case z_axis:
-        m[0][0] = cos(angle);
-        m[0][1] = -sin(angle);
-        m[1][0] = sin(angle);
-        m[1][1] = cos(angle);
+        m[0][0] = cos(r_angle);
+        m[0][1] = -sin(r_angle);
+        m[1][0] = sin(r_angle);
+        m[1][1] = cos(r_angle);
         break;
       default:
         break;
@@ -102,11 +111,11 @@ public:
 
   bool isValid() const { return valid; }
 
-  double& operator()(unsigned row, unsigned col){
+  float& operator()(unsigned row, unsigned col){
     assert(!(row >= LEN || col >= LEN));
     return m[row][col];
   }
-  double operator()(unsigned row, unsigned col) const {
+  float operator()(unsigned row, unsigned col) const {
     assert(!(row >= LEN || col >= LEN));
     return m[row][col];
   }
@@ -169,26 +178,26 @@ public:
   }
 
   Matrix inv(){
-    double A2323 = m[2][2] * m[3][3] - m[2][3] * m[3][2] ;
-    double A1323 = m[2][1] * m[3][3] - m[2][3] * m[3][1] ;
-    double A1223 = m[2][1] * m[3][2] - m[2][2] * m[3][1] ;
-    double A0323 = m[2][0] * m[3][3] - m[2][3] * m[3][0] ;
-    double A0223 = m[2][0] * m[3][2] - m[2][2] * m[3][0] ;
-    double A0123 = m[2][0] * m[3][1] - m[2][1] * m[3][0] ;
-    double A2313 = m[1][2] * m[3][3] - m[1][3] * m[3][2] ;
-    double A1313 = m[1][1] * m[3][3] - m[1][3] * m[3][1] ;
-    double A1213 = m[1][1] * m[3][2] - m[1][2] * m[3][1] ;
-    double A2312 = m[1][2] * m[2][3] - m[1][3] * m[2][2] ;
-    double A1312 = m[1][1] * m[2][3] - m[1][3] * m[2][1] ;
-    double A1212 = m[1][1] * m[2][2] - m[1][2] * m[2][1] ;
-    double A0313 = m[1][0] * m[3][3] - m[1][3] * m[3][0] ;
-    double A0213 = m[1][0] * m[3][2] - m[1][2] * m[3][0] ;
-    double A0312 = m[1][0] * m[2][3] - m[1][3] * m[2][0] ;
-    double A0212 = m[1][0] * m[2][2] - m[1][2] * m[2][0] ;
-    double A0113 = m[1][0] * m[3][1] - m[1][1] * m[3][0] ;
-    double A0112 = m[1][0] * m[2][1] - m[1][1] * m[2][0] ;
+    float A2323 = m[2][2] * m[3][3] - m[2][3] * m[3][2] ;
+    float A1323 = m[2][1] * m[3][3] - m[2][3] * m[3][1] ;
+    float A1223 = m[2][1] * m[3][2] - m[2][2] * m[3][1] ;
+    float A0323 = m[2][0] * m[3][3] - m[2][3] * m[3][0] ;
+    float A0223 = m[2][0] * m[3][2] - m[2][2] * m[3][0] ;
+    float A0123 = m[2][0] * m[3][1] - m[2][1] * m[3][0] ;
+    float A2313 = m[1][2] * m[3][3] - m[1][3] * m[3][2] ;
+    float A1313 = m[1][1] * m[3][3] - m[1][3] * m[3][1] ;
+    float A1213 = m[1][1] * m[3][2] - m[1][2] * m[3][1] ;
+    float A2312 = m[1][2] * m[2][3] - m[1][3] * m[2][2] ;
+    float A1312 = m[1][1] * m[2][3] - m[1][3] * m[2][1] ;
+    float A1212 = m[1][1] * m[2][2] - m[1][2] * m[2][1] ;
+    float A0313 = m[1][0] * m[3][3] - m[1][3] * m[3][0] ;
+    float A0213 = m[1][0] * m[3][2] - m[1][2] * m[3][0] ;
+    float A0312 = m[1][0] * m[2][3] - m[1][3] * m[2][0] ;
+    float A0212 = m[1][0] * m[2][2] - m[1][2] * m[2][0] ;
+    float A0113 = m[1][0] * m[3][1] - m[1][1] * m[3][0] ;
+    float A0112 = m[1][0] * m[2][1] - m[1][1] * m[2][0] ;
 
-    double det = m[0][0] * (m[1][1] * A2323 - m[1][2] * A1323 + m[1][3] * A1223)
+    float det = m[0][0] * (m[1][1] * A2323 - m[1][2] * A1323 + m[1][3] * A1223)
                 - m[0][1] * (m[1][0] * A2323 - m[1][2] * A0323 + m[1][3] * A0223)
                 + m[0][2] * (m[1][0] * A1323 - m[1][1] * A0323 + m[1][3] * A0123)
                 - m[0][3] * (m[1][0] * A1223 - m[1][1] * A0223 + m[1][2] * A0123);

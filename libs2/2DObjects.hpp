@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GeOS.hpp"
+#include "BasicsRender.hpp"
 #include <cmath>
 
 #include <iostream>
@@ -21,12 +21,18 @@ public:
   bool intersection(const Ray& r, float &t, float &dist) override {
     float denom = dotProduct(normal, r.dir);
     if (fabs(denom) > 1e-6 ) {
-        Direction p_orig = p - r.orig;
-        t = dotProduct(p_orig, normal) / denom;
-        dist = t*r.dir.modulus();
-        return (t >= 0);
+      Direction p_orig = p - r.orig;
+      t = dotProduct(p_orig, normal) / denom;
+      dist = t*r.dir.modulus();
+      return (t >= 0);
     }
     return false;
+  }
+  void transform(const Matrix &m) override {
+    // translate
+    p[xi]+=m(0,3); p[yj]+=m(1,3); p[zk]+=m(2,3);
+    // rotate
+    normal = (m*normal).normalize();
   }
 };
 
@@ -71,6 +77,14 @@ public:
       else return true;*/
     }
     return false;
+  }
+  void transform(const Matrix &m) override {
+    // translate
+    p[xi]+=m(0,3); p[yj]+=m(1,3); p[zk]+=m(2,3);
+    // rotate + scale
+    v1 = m*v1; v1mod = v1.modulus();
+    v2 = m*v2; v2mod = v2.modulus();
+    normal = crossProduct(v2,v1).normalize();
   }
 };
 
@@ -118,5 +132,17 @@ public:
     if (dotProduct(normal,C) < 0) return false; // P is on the right side;
 
     return true; // this ray hits the triangle
+  }
+  void transform(const Matrix &m) override {
+    // NOT PROTECTED!
+    a = m*a;
+    b = m*b;
+    c = m*c;
+  }
+  void prtr(){
+    cout << "Tri{";
+    paint(a);paint(b);paint(c);
+    cout << "} -> d(a-b) = " << (b-a).modulus() << ", d(b-c) = "
+         << (c-b).modulus() << ", d(a-c)" << (c-a).modulus(); 
   }
 };

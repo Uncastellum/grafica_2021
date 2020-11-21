@@ -28,13 +28,12 @@ public:
     return g[3] == 0;
   }
   float& operator[](GeomComponent c){
-    switch (c) {
-      case xi:
-        return g[0];
-      case yj:
-        return g[1];
-      case zk:
-        return g[2];
+    if(c == GeomComponent::xi) return g[0];
+    else if(c == GeomComponent::yj) return g[1];
+    else if(c == GeomComponent::zk) return g[2];
+    else{
+      cout << "ERROR ACCESO" << endl;
+      return g[4];
     }
   }
   float operator[](GeomComponent c) const {
@@ -128,11 +127,16 @@ public:
   Point operator/(float escalar) const {
     return Point(g[0]/escalar, g[1]/escalar, g[2]/escalar);
   }
+  Point& operator-=(const Point& other) {
+    this -> g[0] = this -> g[0] - other.g[0];
+    this -> g[1] = this -> g[1] - other.g[1];
+    this -> g[2] = this -> g[2] - other.g[2];
+    return *this;
+  }
   Direction to_dir() const {
     return Direction(g[0],g[1],g[2]);
   }
 };
-
 
 
 float dotProduct(const Direction& a, const Direction& b) {
@@ -161,35 +165,3 @@ void paint(GeomObj v){
   printf("%.3f  ", v.getyj());
   printf("%.3f)", v.getzk());
 }
-
-struct Ray {
-  Point orig;
-  Direction dir;
-  Ray(){}
-  Ray(Point o, Direction d) : orig(o), dir(d) {}
-};
-
-struct RGB {
-  float red, green, blue;
-  RGB(){}
-  RGB(float r, float g, float b) : red(r), green(g), blue(b) {}
-};
-
-void paint(RGB t){
-  cout << "(" << t.red << ", " << t.green << ", " << t.blue << ")";
-}
-
-class Object{
-protected:
-  RGB solid_color;
-  Object(){};
-public:
-  virtual bool intersection(const Ray& r, float &t, float &dist) = 0;
-
-  void setRGB(RGB sc){
-    solid_color = sc;
-  }
-  RGB getSolid(){
-    return solid_color;
-  }
-};
