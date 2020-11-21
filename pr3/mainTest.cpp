@@ -37,8 +37,10 @@ int main(){
 
   shared_ptr<Object> fp ( new FinitePlane(Point(0,1,1), Direction(0,0.5,0), Direction(0,0,0.5)) );    fp ->setRGB(RGB(64, 64, 64));
 
-  shared_ptr<Object> ico ( new PLYObject("dodecahedron.ply") );
-  scn.addObj(ico);
+  shared_ptr<Object> ico ( new PLYObject("../objects/dodecahedron.ply") ); ico->rotate(z_axis, 60); ico->rotate(x_axis, -45);
+  shared_ptr<Object> ico2 ( new PLYObject("../objects/dodecahedron.ply") ); ico2->rotate(y_axis, 45);
+  ico->traslate(5,2,2); ico2->traslate(6,-2,-2);
+  scn.addObj(ico); scn.addObj(ico2);
 
   /*scn.addObj(pared_fr);
   scn.addObj(pared_iz);
