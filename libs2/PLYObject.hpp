@@ -80,7 +80,7 @@ public:
       if (len >= 3){
         int a,b,c;
         f >> a >> c;
-        RGB test(rand()%256,rand()%256,rand()%256);
+        RGB test = RGB255(rand()%256,rand()%256,rand()%256);
         for (size_t j = 2; j < len; j++) {
           b = c; f >> c;
           if (a > vertex || b > vertex || c > vertex) continue;
@@ -109,7 +109,7 @@ public:
 
   bool intersection(const Ray& r, float &t, float &dist) override {
     float d = 0, t0 = 0; dist = -1, t = -1;
-    solid_color = RGB(64,64,64);
+    solid_color = RGB255(64,64,64);
     Matrix localsys(Direction(1,0,0), Direction(0,1,0), Direction(0,0,1), center);
     Ray external;
     external.orig = localsys*r.orig;
@@ -149,8 +149,8 @@ public:
     if (filename.size() < 10) return;
     if(filename.substr(11) == "icosahedron.ply") {
       if(obj.size() != 20) return;
-      RGB r(181, 99, 67); RGB g(50, 168, 82); RGB b(59, 154, 173);
-      RGB spec(100,100,100); RGB neg(0,0,0);
+      RGB r=RGB255(181, 99, 67); RGB g=RGB255(50, 168, 82); RGB b=RGB255(59, 154, 173);
+      RGB spec=RGB255(100,100,100); RGB neg(0,0,0);
       obj[0].setRGB(r); obj[4].setRGB(r); obj[8].setRGB(r); obj[12].setRGB(r);
       obj[1].setRGB(b); obj[5].setRGB(b); obj[9].setRGB(b); obj[13].setRGB(b);
       obj[2].setRGB(g); obj[6].setRGB(g); obj[10].setRGB(g); obj[14].setRGB(g);

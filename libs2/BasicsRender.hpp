@@ -30,8 +30,10 @@ struct RGB {
   float red, green, blue;
   RGB(){}
   RGB(float r, float g, float b) : red(r), green(g), blue(b) {}
-  //RGB255(float r, float g, float b) : red(r/255), green(g/255), blue(b/255) {}
 };
+RGB RGB255(float r, float g, float b) {
+  return RGB(r/255, g/255, b/255);
+}
 
 void paint(RGB t){
   cout << "(" << t.red << ", " << t.green << ", " << t.blue << ")";

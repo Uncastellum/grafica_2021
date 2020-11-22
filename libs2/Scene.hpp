@@ -69,7 +69,7 @@ public:
     objs.push_back(obj);
   }
   void exportImg(string file){
-    //out_img.exportRay(file);
+    //out_img.exportLDR(file);
     out_img.exportBitmap(file);
   }
 
@@ -99,31 +99,6 @@ public:
        out_img(j,i) = color;
      }
    }
- }
-
-  void RayTracing1rppx2(const int x, const int y){
-    out_img = Image(x,y);
-    Ray ray;
-    //#pragma omp parallel for schedule(dynamic,1)
-    for (int i = 0; i < x; i++) {
-      //#pragma omp parallel for schedule(dynamic,1)
-      for (int j = 0; j < y; j++) {
-        ray = c.getRaypp(x,y,i,j);
-        float dist_obj = -1, d = 0, t;
-        RGB color(64,64,64);
-
-        for (int k = 0; k < objs.size(); k++) {
-          if( objs[k]->intersection(ray, t, d) ){ //comprobamos interseccion
-            if (dist_obj == -1 || dist_obj > d) {
-              dist_obj = d;
-              color = objs[k]->getSolid();
-            }
-          }
-        }
-
-        out_img(i,j) = color;
-      }
-    }
   }
 
   void RayTracing(const int x, const int y, const int rppx){
@@ -140,7 +115,7 @@ public:
 
           Ray ray = c.getRandomRaypp(x,y,i,j);
           float dist_obj = -1, d = 0, t;
-          RGB color(64,64,64);
+          RGB color = RGB255(64,64,64);
 
           for (int k = 0; k < objs.size(); k++) {
             if( objs[k]->intersection(ray, t, d) ){ //comprobamos interseccion
@@ -159,5 +134,43 @@ public:
         out_img(i,j) = media;
       }
     }
+  }
+
+
+  RGB find_path(Ray ray, int r){ //COMPLETE
+    // 1. Rayo incide en objs?
+    // 2. interseccion debe devolver punto y normal
+    // 3. Cresamos sys_ref (hemiesfera)
+    // 4. Phi y tita de forma aleatoria
+    // 5. vector coor locales -> coor glob
+    // 6. calculo de BRDF(---)
+    // 7. return (6.)*funcion_recursiva_pt(--)
+    return RGB(0,0,0);
+  }
+
+  void PathTracing(const int x, const int y, const int rppx){
+    out_img = Image(x,y);
+
+    #pragma omp parallel for schedule(guided,1)
+    for (int i = 0; i < x; i++) {
+
+      #pragma omp parallel for schedule(guided,1)
+      for (int j = 0; j < y; j++) {
+        RGB media(0,0,0);
+
+        for(int nray = 0; nray < rppx; nray++){
+          Ray ray = c.getRandomRaypp(x,y,i,j);
+
+          RGB color = find_path(ray, 2); //COMPLETE
+
+          media.red += color.red/rppx;
+          media.green += color.green/rppx;
+          media.blue += color.blue/rppx;
+        }
+
+        out_img(i,j) = media;
+      }
+    }
+
   }
 };

@@ -97,23 +97,6 @@ public:
     f.close();
   }
 
-  void exportRay(string file){
-    assert(!empty);
-    ofstream f(file);
-    assert(f.is_open());
-    f << pSix << endl;
-    f << "#MAX=1" << endl;
-    f << name << endl;
-    f << width << " " << height << endl;
-    f << 255 << endl;
-    for (int i = 0; i < width*height; i++) {
-      f << cached[i].red << " " << cached[i].green << " " << cached[i].blue << "     ";
-      if ((i%width)==width-1) f << endl;
-    }
-    f.close();
-  }
-
-
   void exportBitmap(string filename){
     typedef struct                       /**** BMP file header structure ****/
         {
@@ -182,9 +165,13 @@ public:
         for (int x = 0; x < bih.biWidth; x++) /*Column loop forwards*/
             {
             /*compute some pixel values*/
-            unsigned char r = cached[(y*width)+x].red;
-            unsigned char g = cached[(y*width)+x].green;
-            unsigned char b = cached[(y*width)+x].blue;
+            RGB it = cached[(y*width)+x];
+            it.red = it.red > 1.0 ? 1.0 : it.red ;
+            it.green = it.green > 1.0 ? 1.0 : it.green ;
+            it.blue = it.blue > 1.0 ? 1.0 : it.blue ;
+            unsigned char r = it.red * 255;
+            unsigned char g = it.green * 255;
+            unsigned char b = it.blue * 255;
             fwrite(&b, 1, 1, file);
             fwrite(&g, 1, 1, file);
             fwrite(&r, 1, 1, file);

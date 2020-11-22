@@ -21,14 +21,11 @@ int main(){
   Camera c(Point(-3, 0, 0), Direction(0,0,1), Direction(0,1,0), Direction(0.85,0,0));
 
   Scene scn(c);
-  shared_ptr<Object> pared_fr ( new Plane(Point(5,0,0), Direction(1,0,0)) );    pared_fr ->setRGB(RGB255(255, 20, 20));
-  shared_ptr<Object> pared_iz ( new Plane(Point(5,3,0), Direction(0,1,0)) );    pared_iz ->setRGB(RGB255(20, 255, 20));
-  shared_ptr<Object> pared_de ( new Plane(Point(5,-3,0), Direction(0,-1,0)) );  pared_de ->setRGB(RGB255(90, 255, 90));
-  shared_ptr<Object> pared_up ( new Plane(Point(5,0,3), Direction(0,0,1)) );    pared_up ->setRGB(RGB255(20, 20, 255));
-  shared_ptr<Object> pared_do ( new Plane(Point(5,0,-3), Direction(0,0,-1)) );  pared_do ->setRGB(RGB255(176, 176, 176));
-
-  shared_ptr<Object> t ( new Triangle(Point(1,0,-3), Point(2,1,-3), Point(2,0,0)) );  t ->setRGB(RGB255(66, 245, 227));
-  shared_ptr<Object> ti ( new Triangle(Point(1,0,-3), Point(2,-1,-3), Point(2,0,0)) );  ti ->setRGB(RGB255(250, 137, 220));
+  shared_ptr<Object> pared_fr ( new Plane(Point(2,0,0), Direction(1,0,0)) );    pared_fr ->setRGB(RGB255(156, 156, 156));
+  shared_ptr<Object> pared_iz ( new Plane(Point(5,3,0), Direction(0,1,0)) );    pared_iz ->setRGB(RGB255(173, 207, 116));
+  shared_ptr<Object> pared_de ( new Plane(Point(5,-3,0), Direction(0,-1,0)) );  pared_de ->setRGB(RGB255(116, 169, 207));
+  shared_ptr<Object> pared_up ( new Plane(Point(5,0,3), Direction(0,0,1)) );    pared_up ->setRGB(RGB255(255, 74, 74));
+  shared_ptr<Object> pared_do ( new Plane(Point(5,0,-3), Direction(0,0,-1)) );  pared_do ->setRGB(RGB255(156, 156, 156));
 
   shared_ptr<Object> pelota ( new Pelota(Point(2.2,0.3,0), 0.5) );  pelota ->setRGB(RGB255(157, 250, 165));
   shared_ptr<Object> pelotaa ( new Pelota(Point(2.2,1.3,0), 1) );  pelotaa ->setRGB(RGB255(94, 133, 106));
@@ -38,25 +35,14 @@ int main(){
 
   shared_ptr<Object> fp ( new FinitePlane(Point(0,1,1), Direction(0,0.5,0), Direction(0,0,0.5)) );    fp ->setRGB(RGB255(64, 64, 64));
 
-  shared_ptr<Object> ico ( new PLYObject("../objects/icosahedron.ply") );
-  //ico->doItSpecial();
-  ico->transform(Matrix(rotate,y_axis,20));
-  ico->transform(Matrix(rotate,z_axis,30));
-  ico->transform(Matrix(scale,30,30,30));
-  ico->transform(Matrix(traslate,-10,18,-15));
-  /*
-  ico->transform(Matrix(traslate,4,12,-15));*/
-
-  scn.addObj(ico);
-  scn.addObj(pared_do);
-  scn.addObj(pelota);
-
-  /*scn.addObj(pared_fr);
+  scn.addObj(pared_fr);
   scn.addObj(pared_iz);
   scn.addObj(pared_de);
   scn.addObj(pared_up);
-  scn.addObj(t);
-  scn.addObj(ti);
+  scn.addObj(pared_do);
+
+  scn.addObj(pelota);
+  /*
   scn.addObj(pelotaa);
   scn.addObj(pelota2);
   scn.addObj(pelota22);
