@@ -14,8 +14,19 @@ using namespace std;
 struct Ray {
   Point orig;
   Direction dir;
+  /*class {
+    public:
+      Direction cast;
+      Direction not_normalized;
+      Direction & operator = (const Direction &i) {
+        not_normalized = i;
+        cast = i; cast.normalize();
+        return cast;
+      }
+      operator Direction () const { return cast; }
+  } dir;*/
   Ray(){}
-  Ray(Point o, Direction d) : orig(o), dir(d) {}
+  Ray(Point o, Direction d) /*: orig(o), dir(d)*/ { orig = o; dir = d;}
 };
 
 void paint(Ray r){

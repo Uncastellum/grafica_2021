@@ -9,7 +9,7 @@
 #include <cstdlib>
 
 
-#include "GeOS.hpp"
+#include "BasicsRender.hpp"
 #include "Image.hpp"
 //#include "Matrix.hpp"
 
@@ -138,13 +138,44 @@ public:
   }
 
 
-  RGB find_path(Ray ray, int r){ //COMPLETE
+  RGB find_path(const Ray& ray, int r){ //COMPLETE
+    float dist_obj = -1, d = 0, t = -1;
+    Direction n, n0;
+
     // 1. Rayo incide en objs?
-    // 2. interseccion debe devolver punto y normal
+    for (int k = 0; k < objs.size(); k++) {
+      // 2. interseccion debe devolver punto y normal
+      if( objs[k]->intersection(ray, t, d, n0) ){
+        if (dist_obj == -1 || dist_obj > d) {
+          n0 = n;
+          dist_obj = d;
+          color = objs[k]->getSolid();
+        }
+      }
+    }
+
+    if (dist_obj == -1) return RGB(0,0,0);
+
     // 3. Cresamos sys_ref (hemiesfera)
+    Point o = ray.orig + ray.dir*t;
+    Direction localsys[3];
+    localsys[0] = n;
+    localsys[1] = Matrix(rotate,z_axis,90)*n;
+    localsys[2] = crossProduct(n, localsys[1]);
+
     // 4. Phi y tita de forma aleatoria
-    // 5. vector coor locales -> coor glob
-    // 6. calculo de BRDF(---)
+    // (float) rand() / (RAND_MAX) ∈ [0,1]
+    float phi = ((float) rand() / (RAND_MAX)),
+          theta = ((float) rand() / (RAND_MAX));
+    theta = acos(sqrt(1-theta));
+    phi = 2*PI*phi;
+
+    // 5. nuevo vector aleatorio + cambio coor
+    Matrix to_global(localsys[0], localsys[1], localsys[2], o);
+
+    // 6. calculo de BRDF(---) ¿+ Ruleta Rusa?
+
+
     // 7. return (6.)*funcion_recursiva_pt(--)
     return RGB(0,0,0);
   }
