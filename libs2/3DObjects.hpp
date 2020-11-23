@@ -1,6 +1,7 @@
 #pragma once
 
-#include "GeOS.hpp"
+//#include "GeOS.hpp"
+#include "BasicsRender.hpp"
 
 // g++ -std=c++11 -I. 3DObjects.hpp -O3 -o efe.o
 
@@ -12,7 +13,7 @@ private:
 public:
   Pelota(Point cen, float rad) : center(cen), radius(rad) {}
   // https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/ray-triangle-intersection-geometric-solution
-  bool intersection(const Ray& r, float &t, float &dist) override {
+  bool intersection(const Ray& r, float &t, float &dist, Direction& n) override {
     float t0, t1; // solutions for t if the ray intersects
     // analytic solution
     Direction L = r.orig - center;
@@ -30,6 +31,7 @@ public:
 
     t = t0;
     dist = t*r.dir.modulus();
+    n = ((r.orig + r.dir*t) - center).normalize();
 
     return true;
   }

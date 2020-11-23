@@ -44,7 +44,7 @@ protected:
   RGB solid_color;
   Object(){};
 public:
-  virtual bool intersection(const Ray& r, float &t, float &dist) = 0;
+  virtual bool intersection(const Ray& r, float &t, float &dist, Direction& n) = 0;
   virtual void transform(const Matrix &m) = 0;
 
   void setRGB(RGB sc){

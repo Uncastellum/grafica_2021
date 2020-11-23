@@ -15,15 +15,16 @@ protected:
   Plane(){}
 
 public:
-  Plane(Point dist, Direction norm) : p(dist), normal(norm) {}
+  Plane(Point dist, Direction norm) : p(dist), normal(norm.normalize()) {}
 
   // https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-plane-and-ray-disk-intersection
-  bool intersection(const Ray& r, float &t, float &dist) override {
+  bool intersection(const Ray& r, float &t, float &dist, Direction& n) override {
     float denom = dotProduct(normal, r.dir);
     if (fabs(denom) > 1e-6 ) {
       Direction p_orig = p - r.orig;
       t = dotProduct(p_orig, normal) / denom;
       dist = t*r.dir.modulus();
+      n = normal;
       return (t >= 0);
     }
     return false;
@@ -49,8 +50,8 @@ public:
       v1mod = v1.modulus(); v2mod = v2.modulus();
     }
 
-  bool intersection(const Ray& r, float &t, float &dist) override {
-    if(Plane::intersection(r,t,dist)){
+  bool intersection(const Ray& r, float &t, float &dist, Direction& n) override {
+    if(Plane::intersection(r,t,dist,n)){
       Point inter = r.orig + r.dir*t;
       Direction auxv1 = inter - p;
       Direction auxv2 = auxv1;
@@ -91,13 +92,16 @@ public:
 class Triangle : public Object {
 private:
   Point a, b, c;
+  Direction normal;
 public:
-  Triangle(Point _a, Point _b, Point _c) : a(_a), b(_b), c(_c) {}
-  // https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/ray-triangle-intersection-geometric-solution
-  bool intersection(const Ray& r, float &t, float &dist) override {
+  Triangle(Point _a, Point _b, Point _c) : a(_a), b(_b), c(_c) {
     Direction aux1 = b-a;
     Direction aux2 = c-a;
-    Direction normal = crossProduct(aux1, aux2);
+    normal = crossProduct(aux1, aux2).normalize();
+  }
+  // https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/ray-triangle-intersection-geometric-solution
+  bool intersection(const Ray& r, float &t, float &dist, Direction& n) override {
+    n = normal;
     float denom = dotProduct(normal, r.dir);
     if (fabs(denom) < 1e-6 ) {// triangle paralelo a rayo
       return false;
@@ -143,6 +147,6 @@ public:
     cout << "Tri{";
     paint(a);paint(b);paint(c);
     cout << "} -> d(a-b) = " << (b-a).modulus() << ", d(b-c) = "
-         << (c-b).modulus() << ", d(a-c)" << (c-a).modulus(); 
+         << (c-b).modulus() << ", d(a-c)" << (c-a).modulus();
   }
 };

@@ -107,17 +107,18 @@ public:
     f.close();
   }
 
-  bool intersection(const Ray& r, float &t, float &dist) override {
+  bool intersection(const Ray& r, float &t, float &dist, Direction& n) override {
     float d = 0, t0 = 0; dist = -1, t = -1;
     solid_color = RGB255(64,64,64);
     Matrix localsys(Direction(1,0,0), Direction(0,1,0), Direction(0,0,1), center);
-    Ray external;
+    Ray external; Direction n1;
     external.orig = localsys*r.orig;
     external.dir = localsys*r.dir;
 
     for (int k = 0; k < obj.size(); k++) {
-      if( obj[k].intersection(external, t0, d) ){ //comprobamos interseccion
+      if( obj[k].intersection(external, t0, d, n1) ){ //comprobamos interseccion
         if (dist == -1 || dist > d) {
+          n = n1;
           dist = d; t = t0;
           solid_color = obj[k].getSolid();
         }

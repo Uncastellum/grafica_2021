@@ -83,11 +83,11 @@ public:
      for (int j = 0; j < x; j++) {
        Direction ray = (c.origen + c.f + (aux_l * ((x/2)-(j+1))) + aux_l*0.5 + (aux_u * ((y/2)-(i+1))) + aux_u*0.5 ) - c.origen;
        //paint(ray);
-       float min_choque_dist, choque_dist, t;
+       float min_choque_dist, choque_dist, t; Direction n;
        int choques=0;
        RGB color;
        for (int k = 0; k < objs.size(); k++) {
-         if(objs[k]->intersection(Ray(c.origen, ray), t, choque_dist)){ //comprobamos interseccion
+         if(objs[k]->intersection(Ray(c.origen, ray), t, choque_dist, n)){ //comprobamos interseccion
            choques++;
            if(choques==1||choque_dist<min_choque_dist){ //comprobamos distancia
              min_choque_dist = choque_dist;
@@ -115,10 +115,11 @@ public:
 
           Ray ray = c.getRandomRaypp(x,y,i,j);
           float dist_obj = -1, d = 0, t;
+          Direction n;
           RGB color = RGB255(64,64,64);
 
           for (int k = 0; k < objs.size(); k++) {
-            if( objs[k]->intersection(ray, t, d) ){ //comprobamos interseccion
+            if( objs[k]->intersection(ray, t, d, n) ){ //comprobamos interseccion
               if (dist_obj == -1 || dist_obj > d) {
                 dist_obj = d;
                 color = objs[k]->getSolid();
