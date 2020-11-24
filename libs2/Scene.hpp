@@ -11,7 +11,6 @@
 
 #include "BasicsRender.hpp"
 #include "Image.hpp"
-//#include "Matrix.hpp"
 
 //Compile test: g++ -std=c++11 -I. Scene.hpp -O3 -o efe.o
 using namespace std;
@@ -141,6 +140,7 @@ public:
   RGB find_path(const Ray& ray, int r){ //COMPLETE
     float dist_obj = -1, d = 0, t = -1;
     Direction n, n0;
+    RGB color;
 
     // 1. Rayo incide en objs?
     for (int k = 0; k < objs.size(); k++) {
@@ -149,7 +149,7 @@ public:
         if (dist_obj == -1 || dist_obj > d) {
           n0 = n;
           dist_obj = d;
-          color = objs[k]->getSolid();
+          color = objs[k]->getSolid(); //cambiar por obtener funcion BRDF
         }
       }
     }
@@ -172,6 +172,12 @@ public:
 
     // 5. nuevo vector aleatorio + cambio coor
     Matrix to_global(localsys[0], localsys[1], localsys[2], o);
+    Direction d0(
+        sin(theta)*sin(phi),
+        sin(theta)*cos(phi),
+        cos(theta)
+      );
+    Ray wo(o, to_global*d0);
 
     // 6. calculo de BRDF(---) ¿+ Ruleta Rusa?
 
