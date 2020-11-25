@@ -175,21 +175,21 @@ public:
 
       float dist_obj = -1, d = 0, t = -1;
       Direction n, n0;
-      shared_ptr<Object> intersects;
+      shared_ptr<Object> intersects(nullptr);
 
       // 1. Rayo incide en objs?
       for (int k = 0; k < objs.size(); k++) {
         // 2. interseccion debe devolver punto y normal
-        if( objs[k]->intersection(luz_refl, t, d, n) ){
+        if( objs[k]->intersection(luz_refl, t, d, n0) ){
           if (dist_obj == -1 || dist_obj > d) {
-            n0 = n;
+            n = n0;
             dist_obj = d;
             intersects = objs[k]; //cambiar por obtener funcion BRDF
           }
         }
       }
 
-      if (dist_obj == -1) return resul;
+      if (intersects!=nullptr) return resul;
       // Si es emisor, devolvemos ya su emision
       if (intersects -> emit) return resul;
 
@@ -197,7 +197,7 @@ public:
       Point o = luz_refl.orig + luz_refl.dir*t;
       Direction localsys[3];
       localsys[0] = n;
-      localsys[1] = Matrix(rotate,z_axis,90)*n;
+      localsys[1] = Matrix(matrix_type::rotate, z_axis, 90)*n;
       localsys[2] = crossProduct(n, localsys[1]);
       Matrix to_global(localsys[0], localsys[1], localsys[2], o);
 
@@ -220,7 +220,7 @@ public:
         if (ev <= pd) { // diff
           // rand0_1() = (float) rand() / (RAND_MAX) ∈ [0,1]
           float phi = 2*PI*rand0_1(),
-          theta = acos(sqrt(1-rand0_1()));
+                theta = acos(sqrt(1-rand0_1()));
           Direction d0(
             sin(theta)*sin(phi),
             sin(theta)*cos(phi),
@@ -228,13 +228,11 @@ public:
           );
           luz_inc.dir = to_global*d0;
           resul = resul * mt->kd;
-
         } else if(pd < ev  && ev < (ps+pd)) { // specular
           Direction wo = luz_refl.dir; wo.normalize();
           Direction wi = n*2*(dotProduct(n, wo)) + neg(wo);
-          luz_inc.dir = wi;
+          luz_inc.dir = to_global*wi;
           resul = resul * mt->ks;
-
         } else { // ev_ignored
           // Matar rayo
           return resul;

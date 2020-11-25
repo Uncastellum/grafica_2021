@@ -16,10 +16,10 @@ public:
   bool intersection(const Ray& r, float &t, float &dist, Direction& n) override {
     float t0, t1; // solutions for t if the ray intersects
     // analytic solution
-    Direction L = r.orig - center;
-    float a = dotProduct(r.dir,r.dir);
-    float b = 2 * dotProduct(r.dir,L);
-    float c = dotProduct(L,L) - (radius*radius);
+    Direction aux = r.orig - center;
+    float a = r.dir.modulus(); a *= a; // r.dir.modulus()*r.dir.modulus()
+    float b = 2 * dotProduct(r.dir,aux);
+    float c = aux.modulus(); c *= c; c -= (radius*radius);
 
     if (!solveQuadratic(a, b, c, t0, t1)) return false;
     if (t0 > t1) std::swap(t0, t1);
