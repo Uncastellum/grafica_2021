@@ -138,7 +138,9 @@ public:
   }
 };
 
-
+Direction neg(const Direction& a){
+  return Direction(-a[xi], -a[yj], -a[zk]);
+}
 float dotProduct(const Direction& a, const Direction& b) {
   return a[xi]*b[xi] + a[yj]*b[yj] + a[zk]*b[zk];
 }

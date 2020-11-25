@@ -5,8 +5,6 @@
 #include <memory>
 
 #include <cassert>
-#include <ctime>
-#include <cstdlib>
 
 
 #include "BasicsRender.hpp"
@@ -25,7 +23,6 @@ private:
 
 public:
   Camera(Point c_, Direction u_, Direction l_, Direction f_) {
-    srand(time(NULL));
     origen = c_;
     u = u_.normalize(); l = l_.normalize();
     f = f_;
@@ -41,8 +38,8 @@ public:
   Ray getRandomRaypp(const int x, const int y, const int p_i, const int p_j) const {
     //assert(!(p_i >= x || p_j >= y));
     int max = (x > y) ? x : y;
-    float c_x = x - 2.0*(p_i + ((float) rand() / (RAND_MAX))),
-          c_y = y - 2.0*(p_j + ((float) rand() / (RAND_MAX)));
+    float c_x = x - 2.0*(p_i + rand0_1()),
+          c_y = y - 2.0*(p_j + rand0_1());
     return Ray(origen, f + u*(c_y/max) + l*(c_x/max));
   };
 };
@@ -137,53 +134,89 @@ public:
   }
 
 
-  RGB find_path(const Ray& ray, int r){ //COMPLETE
-    float dist_obj = -1, d = 0, t = -1;
-    Direction n, n0;
-    RGB color;
+  RGB find_path(const Ray& ray){ //COMPLETE
+    RGB resul;
+    Ray luz_refl = ray;
 
-    // 1. Rayo incide en objs?
-    for (int k = 0; k < objs.size(); k++) {
-      // 2. interseccion debe devolver punto y normal
-      if( objs[k]->intersection(ray, t, d, n0) ){
-        if (dist_obj == -1 || dist_obj > d) {
-          n0 = n;
-          dist_obj = d;
-          color = objs[k]->getSolid(); //cambiar por obtener funcion BRDF
+    while(true){
+
+      float dist_obj = -1, d = 0, t = -1;
+      Direction n, n0;
+      shared_ptr<Object> intersects;
+
+      // 1. Rayo incide en objs?
+      for (int k = 0; k < objs.size(); k++) {
+        // 2. interseccion debe devolver punto y normal
+        if( objs[k]->intersection(luz_refl, t, d, n) ){
+          if (dist_obj == -1 || dist_obj > d) {
+            n0 = n;
+            dist_obj = d;
+            intersects = objs[k]; //cambiar por obtener funcion BRDF
+          }
         }
       }
+
+      if (dist_obj == -1) return resul;
+      // Si es emisor, devolvemos ya su emision
+      if (intersects -> emit) return resul;
+
+      // 3. Creamos sys_ref (hemiesfera) y mtx cambio coor
+      Point o = luz_refl.orig + luz_refl.dir*t;
+      Direction localsys[3];
+      localsys[0] = n;
+      localsys[1] = Matrix(rotate,z_axis,90)*n;
+      localsys[2] = crossProduct(n, localsys[1]);
+      Matrix to_global(localsys[0], localsys[1], localsys[2], o);
+
+      // 4. Ruleta rusa
+      Ray luz_inc;
+      luz_inc.orig = o;
+      material mt = intersects -> mt;
+      if (!mt.is_dielectric) { // 4.0 (Lamb_diff, perf_specular or both)
+        // 4.1 Calculo de prob
+        float pd = max(mt.kd); pd /= (pd + max(mt.ks));
+        float ps = 1 - pd;
+        float sum = pd + ps;
+        if (sum > 0.9) {
+          pd = 0.9*pd/sum;
+          ps = 0.9*ps/sum;
+        }
+
+        // 4.2 RR -> event¿?
+        float ev = rand0_1();
+        if (ev <= pd) { // diff
+          // rand0_1() = (float) rand() / (RAND_MAX) ∈ [0,1]
+          float phi = 2*PI*rand0_1(),
+          theta = acos(sqrt(1-rand0_1()));
+          Direction d0(
+            sin(theta)*sin(phi),
+            sin(theta)*cos(phi),
+            cos(theta)
+          );
+          luz_inc.dir = to_global*d0;
+          resul = resul * mt.kd;
+
+        } else if(pd < ev  && ev < (ps+pd)) { // specular
+          Direction wo = luz_refl.dir; wo.normalize();
+          Direction wi = n*2*(dotProduct(n, wo)) + neg(wo);
+          luz_inc.dir = wi;
+          resul = resul * mt.ks;
+
+        } else { // ev_ignored
+          // Matar rayo
+          return resul;
+        }
+
+        luz_refl = luz_inc;
+      } else { // 4.0 (dielectric)
+
+
+      }
+
     }
 
-    if (dist_obj == -1) return RGB(0,0,0);
-
-    // 3. Cresamos sys_ref (hemiesfera)
-    Point o = ray.orig + ray.dir*t;
-    Direction localsys[3];
-    localsys[0] = n;
-    localsys[1] = Matrix(rotate,z_axis,90)*n;
-    localsys[2] = crossProduct(n, localsys[1]);
-
-    // 4. Phi y tita de forma aleatoria
-    // (float) rand() / (RAND_MAX) ∈ [0,1]
-    float phi = ((float) rand() / (RAND_MAX)),
-          theta = ((float) rand() / (RAND_MAX));
-    theta = acos(sqrt(1-theta));
-    phi = 2*PI*phi;
-
-    // 5. nuevo vector aleatorio + cambio coor
-    Matrix to_global(localsys[0], localsys[1], localsys[2], o);
-    Direction d0(
-        sin(theta)*sin(phi),
-        sin(theta)*cos(phi),
-        cos(theta)
-      );
-    Ray wo(o, to_global*d0);
-
-    // 6. calculo de BRDF(---) ¿+ Ruleta Rusa?
-
-
-    // 7. return (6.)*funcion_recursiva_pt(--)
-    return RGB(0,0,0);
+    // 5. return acumm
+    return resul;
   }
 
   void PathTracing(const int x, const int y, const int rppx){
@@ -199,7 +232,7 @@ public:
         for(int nray = 0; nray < rppx; nray++){
           Ray ray = c.getRandomRaypp(x,y,i,j);
 
-          RGB color = find_path(ray, 2); //COMPLETE
+          RGB color = find_path(ray);
 
           media.red += color.red/rppx;
           media.green += color.green/rppx;
