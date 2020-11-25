@@ -57,10 +57,10 @@ public:
       Direction auxv2 = auxv1;
 
       // DENTRO DEL RECTANGULO??? CODIGO SIMPLIFICADO
-      double cosv1 = dotProduct(v1, auxv1);
-      double cosv2 = dotProduct(v2, auxv2);
-      if (cosv1 < v1mod && cosv1 > -v1mod) {
-        if (cosv2 < v2mod && cosv2 > -v2mod) {
+      float cosv1 = dotProduct(v1, auxv1) / v1mod;
+      float cosv2 = dotProduct(v2, auxv2) / v2mod;
+      if (-v1mod < cosv1 && cosv1 < v1mod) {
+        if (-v2mod < cosv2 && cosv2 < v2mod) {
           return true;
         }
       }

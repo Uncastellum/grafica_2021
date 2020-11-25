@@ -19,12 +19,43 @@ class Camera {
 private:
   Point origen;
   Direction u,l,f;
+  Matrix to_global;
   friend class Scene;
 
 public:
+  Camera(Point c_) : Camera(c_, 60, 120, true) {}
+  Camera(Point c_, float maxFOV, bool inDegree){
+    float r_angle = maxFOV/2;
+    if (inDegree) r_angle = r_angle/180*PI;
+    origen = c_;
+    f = Direction(1,0,0);
+    l = Direction(0,cos(r_angle),0);
+    u = Direction(0,0,cos(r_angle));
+    to_global = Matrix(traslate, origen[xi], origen[yj], origen[zk]);
+    cout << "Default camera created in "; paint(c_); cout << ": looking x edge" << endl;
+    cout << "          '---> FOV max = " << maxFOV << (inDegree? " degrees.":" rads.") << endl;
+  }
+  Camera(Point c_, float FOVu, float FOVl, bool inDegree){
+    float u_angle = FOVu/2;
+    float l_angle = FOVl/2;
+    if (inDegree) u_angle = u_angle/180*PI;
+    if (inDegree) l_angle = l_angle/180*PI;
+    origen = c_;
+    f = Direction(1,0,0);
+    l = Direction(0,cos(l_angle),0);
+    u = Direction(0,0,cos(u_angle));
+    to_global = Matrix(traslate, origen[xi], origen[yj], origen[zk]);
+    cout << "Default camera created in "; paint(c_); cout << ": looking x edge" << endl;
+    cout << "         '---> vertical FOV = " << FOVu << ", horiz FOV = " << FOVl
+     << (inDegree? " (degrees).":" (rads).") << endl;
+  }
+
   Camera(Point c_, Direction u_, Direction l_, Direction f_) {
+    cout << "Custom cam created. -> NOT CHECKED" << endl;
+    cout << "DEPRECATED CAMERA!!!" << endl;
     origen = c_;
     u = u_.normalize(); l = l_.normalize();
+    //u = u_; l = l_;
     f = f_;
   }
 
@@ -33,14 +64,16 @@ public:
     int max = (x > y) ? x : y;
     float c_x = x - 2.0*(p_i + 0.5),
            c_y = y - 2.0*(p_j + 0.5);
-    return Ray(origen, f + u*(c_y/max) + l*(c_x/max));
+    Direction dir = f + u*(c_y/max) + l*(c_x/max);
+    return Ray(origen, to_global*dir);
   };
   Ray getRandomRaypp(const int x, const int y, const int p_i, const int p_j) const {
     //assert(!(p_i >= x || p_j >= y));
     int max = (x > y) ? x : y;
     float c_x = x - 2.0*(p_i + rand0_1()),
           c_y = y - 2.0*(p_j + rand0_1());
-    return Ray(origen, f + u*(c_y/max) + l*(c_x/max));
+    Direction dir = f + u*(c_y/max) + l*(c_x/max);
+    return Ray(origen, to_global*dir);
   };
 };
 
@@ -87,7 +120,7 @@ public:
            choques++;
            if(choques==1||choque_dist<min_choque_dist){ //comprobamos distancia
              min_choque_dist = choque_dist;
-             color = objs[k]->getSolid();
+             color = objs[k]->mt().kd;
            }
          }
        }
@@ -118,7 +151,7 @@ public:
             if( objs[k]->intersection(ray, t, d, n) ){ //comprobamos interseccion
               if (dist_obj == -1 || dist_obj > d) {
                 dist_obj = d;
-                color = objs[k]->getSolid();
+                color = objs[k]->mt().kd;
               }
             }
           }
@@ -171,10 +204,10 @@ public:
       // 4. Ruleta rusa
       Ray luz_inc;
       luz_inc.orig = o;
-      material mt = intersects -> mt;
-      if (!mt.is_dielectric) { // 4.0 (Lamb_diff, perf_specular or both)
+      material* mt = &(intersects -> mt());
+      if (!mt->is_dielectric) { // 4.0 (Lamb_diff, perf_specular or both)
         // 4.1 Calculo de prob
-        float pd = max(mt.kd); pd /= (pd + max(mt.ks));
+        float pd = max(mt->kd); pd /= (pd + max(mt->ks));
         float ps = 1 - pd;
         float sum = pd + ps;
         if (sum > 0.9) {
@@ -194,13 +227,13 @@ public:
             cos(theta)
           );
           luz_inc.dir = to_global*d0;
-          resul = resul * mt.kd;
+          resul = resul * mt->kd;
 
         } else if(pd < ev  && ev < (ps+pd)) { // specular
           Direction wo = luz_refl.dir; wo.normalize();
           Direction wi = n*2*(dotProduct(n, wo)) + neg(wo);
           luz_inc.dir = wi;
-          resul = resul * mt.ks;
+          resul = resul * mt->ks;
 
         } else { // ev_ignored
           // Matar rayo

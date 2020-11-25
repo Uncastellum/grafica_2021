@@ -59,6 +59,9 @@ struct RGB {
     return RGB(red/i, green/i, blue/i);
   }
 };
+RGB RGB255(float mono) {
+  return RGB(mono/255, mono/255, mono/255);
+}
 RGB RGB255(float r, float g, float b) {
   return RGB(r/255, g/255, b/255);
 }
@@ -77,25 +80,24 @@ struct material {
   RGB kd = RGB(0.5);
   RGB ks = RGB(0);
   bool is_dielectric = false;
+  material(){}
 };
 
 class Object{
 protected:
-  RGB solid_color;
   Object(){};
+  material mtl;
 public:
   bool emit = false;
-  material mt;
   virtual bool intersection(const Ray& r, float &t, float &dist, Direction& n) = 0;
   virtual void transform(const Matrix &m) = 0;
 
-  void setRGB(RGB sc){
-    solid_color = sc;
+  virtual material& mt(){
+    return mtl;
   }
-  RGB getSolid(){
-    return solid_color;
+  virtual material mt() const {
+    return mtl;
   }
-
 
   virtual void doItSpecial() {}
 };

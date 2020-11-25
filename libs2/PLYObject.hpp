@@ -26,6 +26,7 @@ private:
   vector<Point> points;
   Point center;
   vector<Triangle> obj;
+  Triangle *marked;
 
 public:
   PLYObject(string file){
@@ -84,7 +85,7 @@ public:
         for (size_t j = 2; j < len; j++) {
           b = c; f >> c;
           if (a > vertex || b > vertex || c > vertex) continue;
-          Triangle t(points[a], points[b], points[c]); t.setRGB(test);
+          Triangle t(points[a], points[b], points[c]); t.mt().kd = test;
           obj.push_back(t);
         }
       } else {
@@ -92,11 +93,11 @@ public:
       }
       /*
       if (len == 5) {
-        Triangle t1(points[ver[0]], points[ver[1]], points[ver[2]]); t1.setRGB(test);
-        Triangle t2(points[ver[1]], points[ver[2]], points[ver[3]]); t2.setRGB(test);
-        Triangle t3(points[ver[2]], points[ver[3]], points[ver[4]]); t3.setRGB(test);
-        Triangle t4(points[ver[3]], points[ver[4]], points[ver[0]]); t4.setRGB(test);
-        Triangle t5(points[ver[4]], points[ver[0]], points[ver[1]]); t5.setRGB(test);
+        Triangle t1(points[ver[0]], points[ver[1]], points[ver[2]]); t1.mt().kd = test;
+        Triangle t2(points[ver[1]], points[ver[2]], points[ver[3]]); t2.mt().kd = test;
+        Triangle t3(points[ver[2]], points[ver[3]], points[ver[4]]); t3.mt().kd = test;
+        Triangle t4(points[ver[3]], points[ver[4]], points[ver[0]]); t4.mt().kd = test;
+        Triangle t5(points[ver[4]], points[ver[0]], points[ver[1]]); t5.mt().kd = test;
         obj.push_back(t1); obj.push_back(t2); obj.push_back(t3); obj.push_back(t4); obj.push_back(t5);
       }
       */
@@ -109,7 +110,7 @@ public:
 
   bool intersection(const Ray& r, float &t, float &dist, Direction& n) override {
     float d = 0, t0 = 0; dist = -1, t = -1;
-    solid_color = RGB255(64,64,64);
+    //solid_color = RGB255(64,64,64);
     Matrix localsys(Direction(1,0,0), Direction(0,1,0), Direction(0,0,1), center);
     Ray external; Direction n1;
     external.orig = localsys*r.orig;
@@ -120,7 +121,8 @@ public:
         if (dist == -1 || dist > d) {
           n = n1;
           dist = d; t = t0;
-          solid_color = obj[k].getSolid();
+          marked = &obj[k];
+          //solid_color = obj[k].getSolid();
         }
       }
     }
@@ -144,6 +146,10 @@ public:
     }
   }
 
+  material& mt() override{
+    if (marked == nullptr) return mtl;
+    return marked->mt();
+  }
 
   void doItSpecial() override {
     // ../objects/dodecahedron.ply
@@ -152,11 +158,11 @@ public:
       if(obj.size() != 20) return;
       RGB r=RGB255(181, 99, 67); RGB g=RGB255(50, 168, 82); RGB b=RGB255(59, 154, 173);
       RGB spec=RGB255(100,100,100); RGB neg(0,0,0);
-      obj[0].setRGB(r); obj[4].setRGB(r); obj[8].setRGB(r); obj[12].setRGB(r);
-      obj[1].setRGB(b); obj[5].setRGB(b); obj[9].setRGB(b); obj[13].setRGB(b);
-      obj[2].setRGB(g); obj[6].setRGB(g); obj[10].setRGB(g); obj[14].setRGB(g);
-      obj[3].setRGB(neg); obj[7].setRGB(neg); obj[11].setRGB(neg); obj[15].setRGB(neg);
-      obj[16].setRGB(spec); obj[17].setRGB(spec); obj[18].setRGB(spec); obj[19].setRGB(spec);
+      obj[0].mt().kd = r; obj[4].mt().kd = r; obj[8].mt().kd = r; obj[12].mt().kd = r;
+      obj[1].mt().kd = b; obj[5].mt().kd = b; obj[9].mt().kd = b; obj[13].mt().kd = b;
+      obj[2].mt().kd = g; obj[6].mt().kd = g; obj[10].mt().kd = g; obj[14].mt().kd = g;
+      obj[3].mt().kd = neg; obj[7].mt().kd = neg; obj[11].mt().kd = neg; obj[15].mt().kd = neg;
+      obj[16].mt().kd = spec; obj[17].mt().kd = spec; obj[18].mt().kd = spec; obj[19].mt().kd = spec;
     }
   }
 

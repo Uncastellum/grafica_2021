@@ -21,22 +21,22 @@ int main(){
   Camera c(Point(-3, 0, 0), Direction(0,0,1), Direction(0,1,0), Direction(0.85,0,0));
 
   Scene scn(c);
-  shared_ptr<Object> pared_fr ( new Plane(Point(5,0,0), Direction(1,0,0)) );    pared_fr ->setRGB(RGB255(255, 20, 20));
-  shared_ptr<Object> pared_iz ( new Plane(Point(5,3,0), Direction(0,1,0)) );    pared_iz ->setRGB(RGB255(20, 255, 20));
-  shared_ptr<Object> pared_de ( new Plane(Point(5,-3,0), Direction(0,-1,0)) );  pared_de ->setRGB(RGB255(90, 255, 90));
-  shared_ptr<Object> pared_up ( new Plane(Point(5,0,3), Direction(0,0,1)) );    pared_up ->setRGB(RGB255(20, 20, 255));
-  shared_ptr<Object> pared_do ( new Plane(Point(5,0,-3), Direction(0,0,-1)) );  pared_do ->setRGB(RGB255(176, 176, 176));
+  shared_ptr<Object> pared_fr ( new Plane(Point(5,0,0), Direction(1,0,0)) );    pared_fr->mt().kd = RGB255(255, 20, 20);
+  shared_ptr<Object> pared_iz ( new Plane(Point(5,3,0), Direction(0,1,0)) );    pared_iz->mt().kd = RGB255(20, 255, 20);
+  shared_ptr<Object> pared_de ( new Plane(Point(5,-3,0), Direction(0,-1,0)) );  pared_de->mt().kd = RGB255(90, 255, 90);
+  shared_ptr<Object> pared_up ( new Plane(Point(5,0,3), Direction(0,0,1)) );    pared_up->mt().kd = RGB255(20, 20, 255);
+  shared_ptr<Object> pared_do ( new Plane(Point(5,0,-3), Direction(0,0,-1)) );  pared_do->mt().kd = RGB255(176, 176, 176);
 
-  shared_ptr<Object> t ( new Triangle(Point(1,0,-3), Point(2,1,-3), Point(2,0,0)) );  t ->setRGB(RGB255(66, 245, 227));
-  shared_ptr<Object> ti ( new Triangle(Point(1,0,-3), Point(2,-1,-3), Point(2,0,0)) );  ti ->setRGB(RGB255(250, 137, 220));
+  shared_ptr<Object> t ( new Triangle(Point(1,0,-3), Point(2,1,-3), Point(2,0,0)) );  t->mt().kd = RGB255(66, 245, 227);
+  shared_ptr<Object> ti ( new Triangle(Point(1,0,-3), Point(2,-1,-3), Point(2,0,0)) );  ti->mt().kd = RGB255(250, 137, 220);
 
-  shared_ptr<Object> pelota ( new Pelota(Point(2.2,0.3,0), 0.5) );  pelota ->setRGB(RGB255(157, 250, 165));
-  shared_ptr<Object> pelotaa ( new Pelota(Point(2.2,1.3,0), 1) );  pelotaa ->setRGB(RGB255(94, 133, 106));
-  shared_ptr<Object> pelota2 ( new Pelota(Point(4.2,0,3), 1) );  pelota2 ->setRGB(RGB255(250, 182, 157));
-  shared_ptr<Object> pelota22 ( new Pelota(Point(4.2,1,3), 1) );  pelota22 ->setRGB(RGB255(94, 133, 106));
-  shared_ptr<Object> pelota3 ( new Pelota(Point(2.2,-3,0), 1) );  pelota3 ->setRGB(RGB255(173, 69, 31));
+  shared_ptr<Object> pelota ( new Pelota(Point(2.2,0.3,0), 0.5) );  pelota->mt().kd = RGB255(157, 250, 165);
+  shared_ptr<Object> pelotaa ( new Pelota(Point(2.2,1.3,0), 1) );  pelotaa->mt().kd = RGB255(94, 133, 106);
+  shared_ptr<Object> pelota2 ( new Pelota(Point(4.2,0,3), 1) );  pelota2->mt().kd = RGB255(250, 182, 157);
+  shared_ptr<Object> pelota22 ( new Pelota(Point(4.2,1,3), 1) );  pelota22->mt().kd = RGB255(94, 133, 106);
+  shared_ptr<Object> pelota3 ( new Pelota(Point(2.2,-3,0), 1) );  pelota3->mt().kd = RGB255(173, 69, 31);
 
-  shared_ptr<Object> fp ( new FinitePlane(Point(0,1,1), Direction(0,0.5,0), Direction(0,0,0.5)) );    fp ->setRGB(RGB255(64, 64, 64));
+  shared_ptr<Object> fp ( new FinitePlane(Point(0,1,1), Direction(0,0.5,0), Direction(0,0,0.5)) );    fp->mt().kd = RGB255(64, 64, 64);
 
   shared_ptr<Object> ico ( new PLYObject("../objects/icosahedron.ply") );
   //ico->doItSpecial();
