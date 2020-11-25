@@ -95,14 +95,12 @@ public:
   float modulus() const {
     return sqrt( g[0]*g[0] + g[1]*g[1] + g[2]*g[2]);
   }
-  Direction normalize() {
+  Direction normalize() const {
     float mod = modulus();
     if (mod != 0){
-      g[0] /= mod;
-      g[1] /= mod;
-      g[2] /= mod;
+      return Direction(g[0]/mod, g[1]/mod, g[2]/mod);
     }
-    return *this;
+    return Direction(g[0], g[1], g[2]);
   }
 };
 

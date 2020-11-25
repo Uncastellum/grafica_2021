@@ -31,14 +31,10 @@ int main(){
   shared_ptr<Object> luz_up (new FinitePlane( Point(0,0,3.9) , Direction(2,0,0), Direction(0,2,0) ));
   luz_up->mt().kd = RGB255(255); luz_up->emit = true;
 
-
-
   shared_ptr<Object> pelota1 ( new Pelota( Point(3, 3, -3), 1) );   pelota1->mt().kd = RGB255(255, 40, 40);
   shared_ptr<Object> pelota2 ( new Pelota( Point(3, -3, -3), 1) );  pelota2->mt().kd = RGB255(40, 255, 40);
   shared_ptr<Object> pelota3 ( new Pelota( Point(3, 1, 3), 1) );    pelota3->mt().kd = RGB255(40, 40, 255);
 
-
-  shared_ptr<Object> fp ( new FinitePlane(Point(0,1,1), Direction(0,0.5,0), Direction(0,0,0.5)) );    fp->mt().kd = RGB255(64, 64, 64);
 
   scn.addObj(pared_fr);
   scn.addObj(pared_iz);
@@ -50,17 +46,11 @@ int main(){
   scn.addObj(pelota1);
   scn.addObj(pelota2);
   scn.addObj(pelota3);
-  /*
-  scn.addObj(pelotaa);
-  scn.addObj(pelota2);
-  scn.addObj(pelota22);
-  scn.addObj(pelota3);
-  scn.addObj(fp);
-  */
 
 
   t0 = clock();
-  scn.PathTracing(1200, 1200, 1);
+  scn.PathTracing(1200, 1200, 40);
+  //scn.PathTracing(600, 600, 40);
   t1 = clock();
   read_time = (double(t1-t0)/CLOCKS_PER_SEC);
   cout << "RT: " << read_time << " segundos" << endl;

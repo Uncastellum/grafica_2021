@@ -83,6 +83,8 @@ private:
   Camera c;
   vector<shared_ptr<Object>> objs;
   Image out_img;
+  // Auyda para rotar direcciones -> Si falla en un eje, otro se asegurara de girarlo
+  Matrix const rotacion_segura = Matrix(matrix_type::rotate, y_axis, 90)*Matrix(matrix_type::rotate, z_axis, 90);
 
 public:
   Scene(const Camera& cam) : c(cam) {}
@@ -167,8 +169,8 @@ public:
   }
 
 
-  RGB find_path(const Ray& ray){ //COMPLETE
-    RGB resul;
+  RGB find_path(const Ray& ray){
+    RGB resul(1,1,1);
     Ray luz_refl = ray;
 
     while(true){
@@ -188,8 +190,9 @@ public:
           }
         }
       }
+      if (isnan(n[xi])){break;}
 
-      if (intersects!=nullptr) return resul;
+      if (intersects==nullptr) return resul;
       // Si es emisor, devolvemos ya su emision
       if (intersects -> emit) return resul;
 
@@ -197,7 +200,7 @@ public:
       Point o = luz_refl.orig + luz_refl.dir*t;
       Direction localsys[3];
       localsys[0] = n;
-      localsys[1] = Matrix(matrix_type::rotate, z_axis, 90)*n;
+      localsys[1] = rotacion_segura*n;
       localsys[2] = crossProduct(n, localsys[1]);
       Matrix to_global(localsys[0], localsys[1], localsys[2], o);
 
@@ -222,17 +225,20 @@ public:
           float phi = 2*PI*rand0_1(),
                 theta = acos(sqrt(1-rand0_1()));
           Direction d0(
-            sin(theta)*sin(phi),
             sin(theta)*cos(phi),
+            sin(theta)*sin(phi),
             cos(theta)
           );
-          luz_inc.dir = to_global*d0;
-          resul = resul * mt->kd;
+
+          luz_inc.dir = (to_global*d0).normalize();
+          resul = resul * (mt->kd/pd);
+          //paint(resul);
         } else if(pd < ev  && ev < (ps+pd)) { // specular
-          Direction wo = luz_refl.dir; wo.normalize();
+          Direction wo = luz_refl.dir.normalize();
           Direction wi = n*2*(dotProduct(n, wo)) + neg(wo);
-          luz_inc.dir = to_global*wi;
-          resul = resul * mt->ks;
+
+          luz_inc.dir = (to_global*wi).normalize();
+          resul = resul * (mt->kd/ps);
         } else { // ev_ignored
           // Matar rayo
           return resul;

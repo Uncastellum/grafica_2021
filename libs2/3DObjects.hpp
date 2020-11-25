@@ -1,10 +1,8 @@
 #pragma once
 
-//#include "GeOS.hpp"
 #include "BasicsRender.hpp"
 
 // g++ -std=c++11 -I. 3DObjects.hpp -O3 -o efe.o
-
 
 class Pelota : public Object {
 private:
@@ -18,8 +16,9 @@ public:
     // analytic solution
     Direction aux = r.orig - center;
     float a = r.dir.modulus(); a *= a; // r.dir.modulus()*r.dir.modulus()
-    float b = 2 * dotProduct(r.dir,aux);
-    float c = aux.modulus(); c *= c; c -= (radius*radius);
+    float b = 2 * dotProduct(r.dir, aux);
+    float c = aux.modulus();
+    c = c*c - radius*radius;
 
     if (!solveQuadratic(a, b, c, t0, t1)) return false;
     if (t0 > t1) std::swap(t0, t1);
@@ -31,7 +30,9 @@ public:
 
     t = t0;
     dist = t*r.dir.modulus();
-    n = ((r.orig + r.dir*t) - center).normalize();
+    //n = ((r.orig + r.dir*t) - center).normalize();
+    n = (r.orig + r.dir*t) - center;
+    n = n.normalize();
 
     return true;
   }

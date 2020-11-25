@@ -73,7 +73,9 @@ float max(const RGB& c) {
 }
 
 void paint(RGB t){
-  cout << "(" << t.red << ", " << t.green << ", " << t.blue << ")";
+  printf("rgb(%.3f  ", t.red);
+  printf("%.3f  ", t.green);
+  printf("%.3f)", t.blue);
 }
 
 struct material {
