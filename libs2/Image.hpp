@@ -77,7 +77,7 @@ public:
 #pragma GCC optimize("O0")
   void exportLDR(string file){
     assert(!empty);
-    ofstream f(file);
+    ofstream f(file + ".ppm");
     assert(f.is_open());
     f << pSix << endl;
     f << "#MAX=1" << endl;
@@ -147,7 +147,8 @@ public:
     //char *cstr = new char[filename.length() + 1];
     //strcpy(cstr, filename.c_str());
 
-    FILE *file = fopen("render.bmp", "wb");
+    string aux = filename + ".bmp";
+    FILE *file = fopen(aux.c_str(), "wb");
     if (!file)
         {
         printf("Could not write file\n");
@@ -190,8 +191,22 @@ public:
   void exportLDR(string file){
     i.exportLDR(file);
   }
+  void exportBMP(string file){
+    i.exportBitmap(file);
+  }
+  float getMax(){
+    float max = 0;
+    for (size_t it = 0; it < i.cached.size(); it++) {
+      RGB tp = i.cached[it];
+      if (tp.red > max) max = tp.red;
+      if (tp.green > max) max = tp.green;
+      if (tp.blue > max) max = tp.blue;
+    }
+    return max;
+  }
 
   // img.apply_tone_mapper(clamp);
+  // img.apply_tone_mapper(equalization);
   // img.apply_tone_mapper(clamp_equaliz, 0.456);
   // img.apply_tone_mapper(gamma_curve, X, 0.456);  X = dont care
   // img.apply_tone_mapper(clamp_gamma, 0.456, 0,5);
@@ -206,12 +221,7 @@ public:
     }
 
     if (map == equalization || map == clamp_equaliz || map == gamma_curve || map == clamp_gamma) {
-      float max = 0;
-      for (size_t it = 0; it < i.width*i.height; it++) {
-        if (i.cached[it].red > max) max = i.cached[it].red;
-        if (i.cached[it].green > max) max = i.cached[it].green;
-        if (i.cached[it].blue > max) max = i.cached[it].blue;
-      }
+      float max = getMax();
       for (size_t it = 0; it < i.width*i.height; it++) {
         i.cached[it].red = i.cached[it].red/max;
         i.cached[it].green = i.cached[it].green/max;

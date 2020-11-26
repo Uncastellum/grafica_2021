@@ -103,6 +103,9 @@ public:
     //out_img.exportLDR(file);
     out_img.exportBitmap(file);
   }
+  Tone_Mapper getTImg(){
+    return Tone_Mapper(out_img);
+  }
 
   void RayTracing1rppx(int x, int y){
    out_img = Image(x,y);
@@ -170,7 +173,7 @@ public:
 
 
   RGB find_path(const Ray& ray){
-    RGB resul(1,1,1);
+    RGB resul(1);
     Ray luz_refl = ray;
 
     while(true){
@@ -192,9 +195,9 @@ public:
       }
       if (isnan(n[xi])){break;}
 
-      if (intersects==nullptr) return resul;
+      if (intersects==nullptr) return resul*0;
       // Si es emisor, devolvemos ya su emision
-      if (intersects -> emit) return resul;
+      if (intersects -> emit) return resul*(intersects->mt()).kd;
 
       // 3. Creamos sys_ref (hemiesfera) y mtx cambio coor
       Point o = luz_refl.orig + luz_refl.dir*t;
@@ -241,7 +244,7 @@ public:
           resul = resul * (mt->kd/ps);
         } else { // ev_ignored
           // Matar rayo
-          return resul;
+          return resul*0;
         }
 
         luz_refl = luz_inc;
