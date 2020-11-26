@@ -24,7 +24,9 @@ public:
       Direction p_orig = p - r.orig;
       t = dotProduct(p_orig, normal) / denom;
       dist = t*r.dir.modulus();
-      n = normal;
+      //PATCH  n = normal;
+      if(denom < 0) n = neg(normal);
+      else n = normal;
       return (t >= 0);
     }
     return false;
@@ -46,7 +48,7 @@ public:
   FinitePlane(Point dist, Direction v1_, Direction v2_) :
     v1(v1_), v2(v2_) {
       p = dist;
-      normal = crossProduct(v2,v1).normalize();
+      normal = crossProduct(v1,v2).normalize();
       v1mod = v1.modulus(); v2mod = v2.modulus();
     }
 

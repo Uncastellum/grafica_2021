@@ -23,14 +23,14 @@ private:
   friend class Scene;
 
 public:
-  Camera(Point c_) : Camera(c_, 60, 120, true) {}
+  Camera(Point c_) : Camera(c_, 70, 110, true) {}
   Camera(Point c_, float maxFOV, bool inDegree){
     float r_angle = maxFOV/2;
     if (inDegree) r_angle = r_angle/180*PI;
     origen = c_;
     f = Direction(1,0,0);
-    l = Direction(0,cos(r_angle),0);
-    u = Direction(0,0,cos(r_angle));
+    u = Direction(0,cos(r_angle),0);
+    l = Direction(0,0,cos(r_angle));
     to_global = Matrix(traslate, origen[xi], origen[yj], origen[zk]);
     cout << "Default camera created in "; paint(c_); cout << ": looking x edge" << endl;
     cout << "          '---> FOV max = " << maxFOV << (inDegree? " degrees.":" rads.") << endl;
@@ -42,8 +42,8 @@ public:
     if (inDegree) l_angle = l_angle/180*PI;
     origen = c_;
     f = Direction(1,0,0);
-    l = Direction(0,cos(l_angle),0);
-    u = Direction(0,0,cos(u_angle));
+    u = Direction(0,cos(u_angle),0);
+    l = Direction(0,0,cos(l_angle));
     to_global = Matrix(traslate, origen[xi], origen[yj], origen[zk]);
     cout << "Default camera created in "; paint(c_); cout << ": looking x edge" << endl;
     cout << "         '---> vertical FOV = " << FOVu << ", horiz FOV = " << FOVl
@@ -65,7 +65,7 @@ public:
     float c_x = x - 2.0*(p_i + 0.5),
            c_y = y - 2.0*(p_j + 0.5);
     Direction dir = f + u*(c_y/max) + l*(c_x/max);
-    return Ray(origen, to_global*dir);
+    return Ray(origen, (to_global*dir).normalize());
   };
   Ray getRandomRaypp(const int x, const int y, const int p_i, const int p_j) const {
     //assert(!(p_i >= x || p_j >= y));
@@ -73,7 +73,7 @@ public:
     float c_x = x - 2.0*(p_i + rand0_1()),
           c_y = y - 2.0*(p_j + rand0_1());
     Direction dir = f + u*(c_y/max) + l*(c_x/max);
-    return Ray(origen, to_global*dir);
+    return Ray(origen, (to_global*dir).normalize());
   };
 };
 
@@ -116,6 +116,7 @@ public:
      #pragma omp parallel for schedule(guided,1)
      for (int j = 0; j < x; j++) {
        Direction ray = (c.origen + c.f + (aux_l * ((x/2)-(j+1))) + aux_l*0.5 + (aux_u * ((y/2)-(i+1))) + aux_u*0.5 ) - c.origen;
+       ray = ray.normalize();
        //paint(ray);
        float min_choque_dist, choque_dist, t; Direction n;
        int choques=0;
@@ -193,7 +194,7 @@ public:
           }
         }
       }
-      if (isnan(n[xi])){break;}
+      if (isnan(n[xi])){cerr<< "err nan" << endl; break;}
 
       if (intersects==nullptr) return resul*0;
       // Si es emisor, devolvemos ya su emision

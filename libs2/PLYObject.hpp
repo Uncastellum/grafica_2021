@@ -114,7 +114,7 @@ public:
     Matrix localsys(Direction(1,0,0), Direction(0,1,0), Direction(0,0,1), center);
     Ray external; Direction n1;
     external.orig = localsys*r.orig;
-    external.dir = localsys*r.dir;
+    external.dir = (localsys*r.dir).normalize();
 
     for (int k = 0; k < obj.size(); k++) {
       if( obj[k].intersection(external, t0, d, n1) ){ //comprobamos interseccion

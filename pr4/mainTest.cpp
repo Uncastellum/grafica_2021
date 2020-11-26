@@ -24,16 +24,16 @@ int main(){
 
   Scene scn(c);
   shared_ptr<Object> pared_fr (new FinitePlane( Point(4,0,0) , Direction(0,6,0), Direction(0,0,6) ));  pared_fr->mt().kd = RGB255(55, 156, 156);
-  shared_ptr<Object> pared_iz (new FinitePlane( Point(0,4,0) , Direction(6,0,0), Direction(0,0,6) ));  pared_iz->mt().kd = RGB255(173, 207, 116);
-  shared_ptr<Object> pared_de (new FinitePlane( Point(0,-4,0), Direction(6,0,0), Direction(0,0,6) ));  pared_de->mt().kd = RGB255(116, 169, 207);
-  shared_ptr<Object> pared_up (new FinitePlane( Point(0,0,4) , Direction(6,0,0), Direction(0,6,0) ));  pared_up->mt().kd = RGB255(204, 74, 74);
-  shared_ptr<Object> pared_do (new FinitePlane( Point(0,0,-4), Direction(6,0,0), Direction(0,6,0) ));  pared_do->mt().kd = RGB255(156, 156, 156);
-  shared_ptr<Object> luz_up (new FinitePlane( Point(0,0,3.9) , Direction(2,0,0), Direction(0,2,0) ));
-  luz_up->mt().kd = RGB255(1e4); luz_up->emit = true;
+  shared_ptr<Object> pared_iz (new FinitePlane( Point(0,0,4) , Direction(6,0,0), Direction(0,6,0) ));  pared_iz->mt().kd = RGB255(173, 207, 116);
+  shared_ptr<Object> pared_de (new FinitePlane( Point(0,0,-4), Direction(6,0,0), Direction(0,6,0) ));  pared_de->mt().kd = RGB255(116, 169, 207);
+  shared_ptr<Object> pared_up (new FinitePlane( Point(0,4,0) , Direction(6,0,0), Direction(0,0,6) ));  pared_up->mt().kd = RGB255(204, 74, 74);
+  shared_ptr<Object> pared_do (new FinitePlane( Point(0,-4,0), Direction(6,0,0), Direction(0,0,6) ));  pared_do->mt().kd = RGB255(156, 156, 156);
+  shared_ptr<Object> luz_up (new FinitePlane( Point(0,3.9,0) , Direction(2,0,0), Direction(0,0,2) ));
+  luz_up->mt().kd = RGB(1e7); luz_up->emit = true;
 
-  shared_ptr<Object> pelota1 ( new Pelota( Point(3, 3, -3), 1) );   pelota1->mt().kd = RGB255(204, 55, 55);
-  shared_ptr<Object> pelota2 ( new Pelota( Point(3, -3, -3), 1) );  pelota2->mt().kd = RGB255(55, 204, 40);
-  shared_ptr<Object> pelota3 ( new Pelota( Point(3, 1, 3), 1) );    pelota3->mt().kd = RGB255(55, 55, 204);
+  shared_ptr<Object> pelota1 ( new Pelota( Point(2, -3, 3), 1) );   pelota1->mt().kd = RGB255(204, 55, 55);
+  shared_ptr<Object> pelota2 ( new Pelota( Point(3, -2, -2), 1) );  pelota2->mt().kd = RGB255(55, 204, 55); //pelota2->mt().ks = RGB(0.2);
+  shared_ptr<Object> pelota3 ( new Pelota( Point(3, 2, 1), 1) );    pelota3->mt().kd = RGB255(55, 55, 204);
 
 
   scn.addObj(pared_fr);
@@ -49,7 +49,7 @@ int main(){
 
 
   t0 = clock();
-  scn.PathTracing(1200, 1200, 40);
+  scn.PathTracing(800, 800, 40);
   //scn.PathTracing(600, 600, 40);
   t1 = clock();
   read_time = (double(t1-t0)/CLOCKS_PER_SEC);
