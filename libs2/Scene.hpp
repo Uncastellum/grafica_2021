@@ -256,7 +256,7 @@ public:
       }
 
       //Correccion en punto
-      luz_inc.orig = luz_inc.orig + luz_inc.dir*0.01;
+      luz_inc.orig = luz_inc.orig + n*0.01;
       luz_refl = luz_inc;
     }
 
