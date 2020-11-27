@@ -37,11 +37,11 @@ struct Ray {
 };
 
 void paint(Ray r){
-  printf("Ray(");
+  printf("Ray{");
   paint(r.orig);
   printf(",");
   paint(r.dir);
-  printf(")");
+  printf("}");
 }
 
 struct RGB {
