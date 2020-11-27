@@ -203,9 +203,10 @@ public:
       // 3. Creamos sys_ref (hemiesfera) y mtx cambio coor
       Point o = luz_refl.orig + luz_refl.dir*t;
       Direction localsys[3];
-      localsys[0] = n;
-      localsys[1] = rotacion_segura*n;
-      localsys[2] = crossProduct(n, localsys[1]);
+      localsys[0] = crossProduct(Direction(0,0,1), n).normalize();
+      if (localsys[0].modulus()) localsys[0] = crossProduct(Direction(1,0,0), n).normalize();
+      localsys[1] = n;
+      localsys[2] = crossProduct(localsys[0], n).normalize();
       Matrix to_global(localsys[0], localsys[1], localsys[2], o);
 
       // 4. Ruleta rusa
@@ -214,12 +215,13 @@ public:
       material* mt = &(intersects -> mt());
       if (!mt->is_dielectric) { // 4.0 (Lamb_diff, perf_specular or both)
         // 4.1 Calculo de prob
-        float pd = max(mt->kd); pd /= (pd + max(mt->ks));
-        float ps = 1 - pd;
+        float pd = max(mt->kd);
+        float ps = max(mt->ks);
         float sum = pd + ps;
         if (sum > 0.9) {
           pd = 0.9*pd/sum;
           ps = 0.9*ps/sum;
+          sum = pd + ps;
         }
 
         // 4.2 RR -> event¿?
@@ -230,30 +232,32 @@ public:
                 theta = acos(sqrt(1-rand0_1()));
           Direction d0(
             sin(theta)*cos(phi),
-            sin(theta)*sin(phi),
-            cos(theta)
+            cos(theta),
+            sin(theta)*sin(phi)
           );
 
           luz_inc.dir = (to_global*d0).normalize();
           resul = resul * (mt->kd/pd);
           //paint(resul);
-        } else if(pd < ev  && ev < (ps+pd)) { // specular
+        } else if(pd < ev  && ev < (sum)) { // specular
           Direction wo = luz_refl.dir.normalize();
-          Direction wi = n*2*(dotProduct(n, wo)) + neg(wo);
+          Direction wr = wo - n*2*(dotProduct(wo, n));
 
-          luz_inc.dir = (to_global*wi).normalize();
+          luz_inc.dir = (to_global*wr).normalize();
           resul = resul * (mt->kd/ps);
         } else { // ev_ignored
           // Matar rayo
           return resul*0;
         }
 
-        luz_refl = luz_inc;
       } else { // 4.0 (dielectric)
 
 
       }
 
+      //Correccion en punto
+      luz_inc.orig = luz_inc.orig + luz_inc.dir*0.01;
+      luz_refl = luz_inc;
     }
 
     // 5. return acumm

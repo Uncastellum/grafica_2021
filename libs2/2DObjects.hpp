@@ -27,6 +27,7 @@ public:
       //PATCH  n = normal;
       if(denom < 0) n = neg(normal);
       else n = normal;
+      n = n.normalize();
       return (t >= 0);
     }
     return false;

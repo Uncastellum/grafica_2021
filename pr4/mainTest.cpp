@@ -35,6 +35,17 @@ int main(){
   shared_ptr<Object> pelota2 ( new Pelota( Point(3, -2, -2), 1) );  pelota2->mt().kd = RGB255(55, 204, 55); //pelota2->mt().ks = RGB(0.2);
   shared_ptr<Object> pelota3 ( new Pelota( Point(3, 2, 1), 1) );    pelota3->mt().kd = RGB255(55, 55, 204);
 
+  // TEST
+  shared_ptr<Object> tt1 (new Triangle( Point(6,-3,6), Point(-6,-3,6), Point(6,-3,6) ));  tt1->mt().kd = RGB255(156, 156, 156);
+  shared_ptr<Object> tt2 (new Triangle( Point(-6,-3,6), Point(-6,-3,-6), Point(6,-3,-6) ));  tt2->mt().kd = RGB255(156, 156, 156);
+  shared_ptr<Object> tt3 (new Triangle( Point(4,6,6), Point(4,-6,6), Point(4,6,-6) ));  tt3->mt().kd = RGB255(156, 156, 156);
+  shared_ptr<Object> tt4 (new Triangle( Point(4,-6,6), Point(4,-6,-6), Point(4,6,-6) ));  tt4->mt().kd = RGB255(156, 156, 156);
+
+  scn.addObj(tt1);
+  scn.addObj(tt2);
+  scn.addObj(tt3);
+  scn.addObj(tt4);
+
 
   scn.addObj(pared_fr);
   scn.addObj(pared_iz);
