@@ -106,9 +106,16 @@ public:
   bool intersection(const Ray& r, float &t, float &dist, Direction& n) override {
     n = normal;
     float denom = dotProduct(normal, r.dir);
+
+
+    if(denom < 0){ n = normal;}
+    else{ n = neg(normal);}
+    n = n.normalize();
+
     if (fabs(denom) < 1e-6 ) {// triangle paralelo a rayo
       return false;
     }
+
     float d = dotProduct(normal, (a-r.orig));
     t = (dotProduct(normal, Direction(0,0,0)) + d) / denom;
     if (t < 0) return false; // triangle detras de camara
