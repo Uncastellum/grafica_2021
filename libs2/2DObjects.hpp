@@ -25,8 +25,8 @@ public:
       t = dotProduct(p_orig, normal) / denom;
       dist = t*r.dir.modulus();
       //PATCH  n = normal;
-      if(denom < 0) n = neg(normal);
-      else n = normal;
+      if(denom < 0) n = normal;
+      else n = neg(normal);
       n = n.normalize();
       return (t >= 0);
     }
