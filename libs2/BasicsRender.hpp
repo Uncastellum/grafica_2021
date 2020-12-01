@@ -78,6 +78,22 @@ void paint(RGB t){
   printf("%.3f)", t.blue);
 }
 
+// if n.modulus == 1, (b1 & b2).modulus == 1
+// http://jcgt.org/published/0006/01/01/
+void revisedONB(const Direction &n, Direction &b1, Direction &b2){
+  if(n[zk]<0.){
+    const float a = 1.0f / (1.0f - n[zk]);
+    const float b = n[xi]*n[yj]*a;
+    b1 = Direction(1.0f - n[xi]*n[xi]*a, -b, n[xi]);
+    b2 = Direction(b, n[yj]*n[yj]*a - 1.0f, -n[yj]);
+  } else {
+    const float a = 1.0f / (1.0f + n[zk]);
+    const float b = -n[xi]*n[yj]*a;
+    b1 = Direction(1.0f - n[xi]*n[xi]*a, b, -n[xi]);
+    b2 = Direction(b, 1.0f - n[yj]*n[yj]*a, -n[yj]);
+  }
+}
+
 struct material {
   RGB kd = RGB(0.5);
   RGB ks = RGB(0);

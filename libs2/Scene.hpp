@@ -2,10 +2,10 @@
 
 #include <vector>
 #include <string>
+#include <limits>
 #include <memory>
 
 #include <cassert>
-
 
 #include "BasicsRender.hpp"
 #include "Image.hpp"
@@ -83,8 +83,6 @@ private:
   Camera c;
   vector<shared_ptr<Object>> objs;
   Image out_img;
-  // Auyda para rotar direcciones -> Si falla en un eje, otro se asegurara de girarlo
-  Matrix const rotacion_segura = Matrix(matrix_type::rotate, y_axis, 90)*Matrix(matrix_type::rotate, z_axis, 90);
 
 public:
   Scene(const Camera& cam) : c(cam) {}
@@ -179,7 +177,7 @@ public:
 
     while(true){
 
-      float dist_obj = -1, d = 0, t = -1;
+      float dist_obj = std::numeric_limits<float>::infinity(), d, t;
       Direction n, n0;
       shared_ptr<Object> intersects(nullptr);
 
@@ -187,7 +185,7 @@ public:
       for (int k = 0; k < objs.size(); k++) {
         // 2. interseccion debe devolver punto y normal
         if( objs[k]->intersection(luz_refl, t, d, n0) ){
-          if (dist_obj == -1 || dist_obj > d) {
+          if (dist_obj > d) {
             n = n0;
             dist_obj = d;
             intersects = objs[k]; //cambiar por obtener funcion BRDF
@@ -196,17 +194,18 @@ public:
       }
       if (isnan(n[xi])){cerr<< "err nan" << endl; break;}
 
+      // Si no interseccion, fin. Si es emisor, devolvemos ya su emision
       if (intersects==nullptr) return resul*0;
-      // Si es emisor, devolvemos ya su emision
       if (intersects -> emit) return resul*(intersects->mt()).kd;
 
       // 3. Creamos sys_ref (hemiesfera) y mtx cambio coor
-      Point o = luz_refl.orig + luz_refl.dir*t;
+      Point o = luz_refl.orig + luz_refl.dir*dist_obj;
       Direction localsys[3];
-      localsys[0] = crossProduct(Direction(0,0,1), n).normalize();
-      if (localsys[0].modulus()) localsys[0] = crossProduct(Direction(1,0,0), n).normalize();
       localsys[1] = n;
-      localsys[2] = crossProduct(localsys[0], n).normalize();
+      /*localsys[0] = crossProduct(Direction(0,0,1), n).normalize();
+      if (localsys[0].modulus() == 0) localsys[0] = crossProduct(Direction(1,0,0), n).normalize();
+      localsys[2] = crossProduct(localsys[0], n).normalize();*/
+      revisedONB(localsys[1], localsys[0], localsys[2]);
       Matrix to_global(localsys[0], localsys[1], localsys[2], o);
 
       // 4. Ruleta rusa
@@ -238,12 +237,11 @@ public:
 
           luz_inc.dir = (to_global*d0).normalize();
           resul = resul * (mt->kd/pd);
-          //paint(resul);
         } else if(pd < ev  && ev < (sum)) { // specular
-          Direction wo = luz_refl.dir.normalize();
+          Direction wo = luz_refl.dir;
           Direction wr = wo - n*2*(dotProduct(wo, n));
 
-          luz_inc.dir = (to_global*wr).normalize();
+          luz_inc.dir = wr;
           resul = resul * (mt->kd/ps);
         } else { // ev_ignored
           // Matar rayo
@@ -260,6 +258,8 @@ public:
       luz_refl = luz_inc;
     }
 
+    // No deberia llegar aqui nunca
+    cout << "- - SOCORRO - -" << endl;
     // 5. return acumm
     return resul;
   }
