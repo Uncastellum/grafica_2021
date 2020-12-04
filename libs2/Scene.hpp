@@ -242,7 +242,7 @@ public:
           Direction wr = wo - n*2*(dotProduct(wo, n));
 
           luz_inc.dir = wr;
-          resul = resul * (mt->kd/ps);
+          resul = resul * (mt->ks/ps);
         } else { // ev_ignored
           // Matar rayo
           return resul*0;
