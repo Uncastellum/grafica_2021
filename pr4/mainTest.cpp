@@ -30,7 +30,7 @@ int main(){
   shared_ptr<Object> pared_do (new FinitePlane( Point(0,-4,0), Direction(6,0,0), Direction(0,0,6) ));  pared_do->mt().kd = RGB255(156, 156, 156);
   pared_do->mt().kd = RGB(0); pared_do->mt().ks = RGB(0.8);
   shared_ptr<Object> luz_up (new FinitePlane( Point(0,3.9,0) , Direction(2,0,0), Direction(0,0,2) ));
-  luz_up->mt().kd = RGB(5); luz_up->emit = true;
+  pared_up->mt().kd = RGB(5); pared_up->emit = true;
 
   shared_ptr<Object> pelota1 ( new Pelota( Point(2, -3, 3), 1) );   pelota1->mt().kd = RGB255(204, 55, 55);
   shared_ptr<Object> pelota2 ( new Pelota( Point(3, -2, -2), 1) );  pelota2->mt().kd = RGB255(55, 204, 55); //pelota2->mt().ks = RGB(0.2);
@@ -41,11 +41,11 @@ int main(){
   scn.addObj(pared_de);
   scn.addObj(pared_up);
   scn.addObj(pared_do);
-  scn.addObj(luz_up);
+  //scn.addObj(luz_up);
 
   scn.addObj(pelota1);
   scn.addObj(pelota2);
-  scn.addObj(pelota3);/**/
+  scn.addObj(pelota3);
 
 
   t0 = clock();

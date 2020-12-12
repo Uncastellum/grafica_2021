@@ -38,6 +38,7 @@ public:
   }
   Image(string file){
     ifstream f(file);
+    if(!f.is_open()) cout << "\n [Image] ERROR: Archivo no encontrado." << endl;
     assert(f.is_open());
 
     getline(f, pSix);       assert(pSix == "P3");
@@ -91,6 +92,40 @@ public:
       if(r > 255) r=255;
       if(g > 255) g=255;
       if(b > 255) b=255;
+      f << r << " " << g << " " << b << "     ";
+      if ((i%width)==width-1) f << endl;
+    }
+    f.close();
+  }
+
+  void exportHDR(string file, int color_sp=1e7){
+    assert(!empty);
+    ofstream f(file + ".ppm");
+    assert(f.is_open());
+
+    real_max = 1;
+    for (int i = 0; i < width*height; i++) {
+      float r = cached[i].red / color_sp;
+      float g = cached[i].green / color_sp;
+      float b = cached[i].blue / color_sp;
+      if (r > real_max) real_max = r;
+      if (g > real_max) real_max = g;
+      if (b > real_max) real_max = b;
+    }
+    // max 2 decimales
+    real_max = (((int)(real_max*100+1))/100.0);
+
+    f << pSix << endl;
+    f << "#MAX=" << real_max << endl;
+    f << name << endl;
+    f << width << " " << height << endl;
+    f << color_sp << endl;
+
+    float pre_calc = color_sp / real_max;
+    for (int i = 0; i < width*height; i++) {
+      int r = cached[i].red * pre_calc;
+      int g = cached[i].green * pre_calc;
+      int b = cached[i].blue * pre_calc;
       f << r << " " << g << " " << b << "     ";
       if ((i%width)==width-1) f << endl;
     }
@@ -214,9 +249,9 @@ public:
     float clmp = map == clamp ? 1 : clamp_param;
     if (map == clamp || map == clamp_equaliz || map == clamp_gamma) {
       for (size_t it = 0; it < i.width*i.height; it++) {
-        i.cached[it].red = i.cached[it].red > clmp ? 1 : i.cached[it].red;
-        i.cached[it].green = i.cached[it].green > clmp ? 1 : i.cached[it].green;
-        i.cached[it].blue = i.cached[it].blue > clmp ? 1 : i.cached[it].blue;
+        i.cached[it].red = i.cached[it].red > clmp ? clmp : i.cached[it].red;
+        i.cached[it].green = i.cached[it].green > clmp ? clmp : i.cached[it].green;
+        i.cached[it].blue = i.cached[it].blue > clmp ? clmp : i.cached[it].blue;
       }
     }
 

@@ -65,7 +65,7 @@ public:
     float c_x = x - 2.0*(p_i + 0.5),
            c_y = y - 2.0*(p_j + 0.5);
     Direction dir = f + u*(c_y/max) + l*(c_x/max);
-    return Ray(origen, (to_global*dir).normalize());
+    return Ray(origen, to_global*dir);
   };
   Ray getRandomRaypp(const int x, const int y, const int p_i, const int p_j) const {
     //assert(!(p_i >= x || p_j >= y));
@@ -73,7 +73,7 @@ public:
     float c_x = x - 2.0*(p_i + rand0_1()),
           c_y = y - 2.0*(p_j + rand0_1());
     Direction dir = f + u*(c_y/max) + l*(c_x/max);
-    return Ray(origen, (to_global*dir).normalize());
+    return Ray(origen, to_global*dir);
   };
 };
 
@@ -93,13 +93,19 @@ public:
   Camera getCamera() {
     return c;
   }
-
   void addObj(const shared_ptr<Object>& obj) {
     objs.push_back(obj);
   }
+
   void exportImg(string file){
     //out_img.exportLDR(file);
     out_img.exportBitmap(file);
+  }
+  void exportHDR(string file){
+    out_img.exportHDR(file);
+  }
+  void exportHDR(string file, int csp){
+    out_img.exportHDR(file, csp);
   }
   Tone_Mapper getTImg(){
     return Tone_Mapper(out_img);
@@ -235,13 +241,13 @@ public:
             sin(theta)*sin(phi)
           );
 
-          luz_inc.dir = (to_global*d0).normalize();
+          luz_inc.dir = to_global*d0;
           resul = resul * (mt->kd/pd);
         } else if(pd < ev  && ev < (sum)) { // specular
           Direction wo = luz_refl.dir;
           Direction wr = wo - n*2*(dotProduct(wo, n));
 
-          luz_inc.dir = wr;
+          luz_inc.setdirnorm(wr);
           resul = resul * (mt->ks/ps);
         } else { // ev_ignored
           // Matar rayo

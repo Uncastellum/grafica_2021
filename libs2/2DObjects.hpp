@@ -27,7 +27,7 @@ public:
       //PATCH  n = normal;
       if(denom < 0) n = normal;
       else n = neg(normal);
-      n = n.normalize();
+      //n = n.normalize(); si normal esta normalizada, la negada tmbn
       return (t >= 0);
     }
     return false;
@@ -110,7 +110,7 @@ public:
 
     if(denom < 0){ n = normal;}
     else{ n = neg(normal);}
-    n = n.normalize();
+    //n = n.normalize(); si normal esta normalizada, la negada tmbn
 
     if (fabs(denom) < 1e-6 ) {// triangle paralelo a rayo
       return false;
@@ -152,6 +152,9 @@ public:
     a = m*a;
     b = m*b;
     c = m*c;
+    Direction aux1 = b-a;
+    Direction aux2 = c-a;
+    normal = crossProduct(aux1, aux2).normalize();
   }
   void prtr(){
     cout << "Tri{";

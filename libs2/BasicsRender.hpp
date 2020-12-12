@@ -20,20 +20,29 @@ float rand0_1() {
 
 struct Ray {
   Point orig;
-  Direction dir;
-  /*class {
+  //Direction dir;
+  class {
     public:
-      Direction cast;
-      Direction not_normalized;
-      Direction & operator = (const Direction &i) {
-        not_normalized = i;
-        cast = i; cast.normalize();
-        return cast;
+      Direction d_norm;
+      float mod;
+      Direction& operator= (const Direction &i) {
+        mod = i.modulus();
+        if (mod == 0) d_norm = i;
+        else d_norm = i/mod;
+        mod = 1; // tras normalizar, modulo = 1
+        return d_norm;
       }
-      operator Direction () const { return cast; }
-  } dir;*/
+      operator Direction () const { return d_norm; }
+      Direction operator*(float fl) const { return d_norm*fl; }
+      Direction operator/(float fl) const { return d_norm/fl; }
+      float modulus() const { return mod; }
+  } dir;
   Ray(){}
-  Ray(Point o, Direction d) /*: orig(o), dir(d)*/ { orig = o; dir = d;}
+  Ray(Point o, Direction d) { orig = o; dir = d;}
+  void setdirnorm(Direction d) { // d DEBE ESTAR NORMALIZADO
+    dir.d_norm = d;
+    dir.mod = 1;
+  }
 };
 
 void paint(Ray r){
