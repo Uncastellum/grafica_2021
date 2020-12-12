@@ -106,6 +106,7 @@ void revisedONB(const Direction &n, Direction &b1, Direction &b2){
 struct material {
   RGB kd = RGB(0.5);
   RGB ks = RGB(0);
+  RGB kt = RGB(0);
   bool is_dielectric = false;
   material(){}
 };

@@ -255,13 +255,78 @@ public:
         }
 
       } else { // 4.0 (dielectric)
+        // 4.1.1 Calculo de fresnel
+        float ks, kt;
+        float cosi = dotProduct(luz_refl.dir, n);
+        if (cosi<-1) cosi = -1;
+        if (cosi> 1) cosi =  1;
+        float etai = 1, etat = 1;
+        if (cosi > 0) { std::swap(etai, etat); }
+        // Compute sini using Snell's law
+        float sint = etai / etat * sqrtf(std::max(0.f, 1 - cosi * cosi));
+        // Total internal reflection
+        if (sint >= 1) {
+            ks = 1;
+        }
+        else {
+            float cost = sqrtf(std::max(0.f, 1 - sint * sint));
+            cosi = fabsf(cosi);
+            float Rs = ((etat * cosi) - (etai * cost)) / ((etat * cosi) + (etai * cost));
+            float Rp = ((etai * cosi) - (etat * cost)) / ((etai * cosi) + (etat * cost));
+            ks = (Rs * Rs + Rp * Rp) / 2;
 
+        }
+        kt = 1 - ks;
+        // 4.1.2 Calculo de prob
+        float ps = ks;
+        float pt = kt;
+        float sum = ps + pt;
+        if (sum > 0.9) {
+          ps = 0.9*ps/sum;
+          pt = 0.9*pt/sum;
+          sum = ps + pt;
+        }
+
+        // 4.2 RR -> event¿?
+        float ev = rand0_1();
+        if (ev <= ps) { // reflection     ev <= ps
+          Direction wo = luz_refl.dir;
+          Direction wr = wo - n*2*(dotProduct(wo, n));
+
+          luz_inc.dir = wr;
+          resul = resul * (ks/ps);
+
+        } else if(ps < ev  && ev < sum) { // specular ps < ev  && ev < (sum)
+          Direction wo = luz_refl.dir;
+          float cosi = dotProduct(wo, n);
+          if (cosi<-1) cosi = -1;
+          if (cosi> 1) cosi =  1;
+          float etai = 1, etat = 1;
+          Direction n2 = n;
+          if (cosi < 0) { cosi = -cosi; } else { std::swap(etai, etat); n2= neg(n); }
+          float eta = etai / etat;
+          float k = 1 - eta * eta * (1 - cosi * cosi);
+          Direction wt;
+          if (k < 0){wt = Direction(0,0,0);}
+          else{wt = (wo*eta) + (n2*(eta * cosi - sqrtf(k)));}
+
+          //Direction wo = luz_refl.dir;
+          //float cosi = dotProduct(wo, n);
+          //Direction wt = (wo*1.5 - n * (-cosi * cosi*1.5));
+
+          luz_inc.dir = wt;
+          resul = resul * (kt/pt);
+
+        } else { // ev_ignored
+          // Matar rayo
+          return resul*0;
+        }
 
       }
-
       //Correccion en punto
-      luz_inc.orig = luz_inc.orig + n*0.01;
+      luz_inc.orig = luz_inc.orig + n*0.02;
       luz_refl = luz_inc;
+
     }
 
     // No deberia llegar aqui nunca
