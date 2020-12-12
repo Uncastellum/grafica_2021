@@ -159,6 +159,11 @@ public:
       if(obj.size() != 20) return;
       RGB r=RGB255(181, 99, 67); RGB g=RGB255(50, 168, 82); RGB b=RGB255(59, 154, 173);
       RGB spec=RGB255(100,100,100); RGB neg(0,0,0);
+      for (size_t i = 0; i < obj.size(); i++) {
+        Triangle t = obj[i];
+        t.mt().is_dielectric = true;
+        obj[i] = t;
+      }
       obj[0].mt().kd = r; obj[4].mt().kd = r; obj[8].mt().kd = r; obj[12].mt().kd = r;
       obj[1].mt().kd = b; obj[5].mt().kd = b; obj[9].mt().kd = b; obj[13].mt().kd = b;
       obj[2].mt().kd = g; obj[6].mt().kd = g; obj[10].mt().kd = g; obj[14].mt().kd = g;
