@@ -28,20 +28,21 @@ int main(){
   shared_ptr<Object> pared_de (new FinitePlane( Point(0,0,-4), Direction(6,0,0), Direction(0,6,0) ));  pared_de->mt().kd = RGB255(116, 116, 207);
   shared_ptr<Object> pared_up (new FinitePlane( Point(0,4,0) , Direction(6,0,0), Direction(0,0,6) ));  pared_up->mt().kd = RGB255(204, 74, 74);
   shared_ptr<Object> pared_do (new FinitePlane( Point(0,-4,0), Direction(6,0,0), Direction(0,0,6) ));  pared_do->mt().kd = RGB255(156, 156, 156);
-  pared_do->mt().kd = RGB(0); pared_do->mt().ks = RGB(0.8);
+  //pared_fr->mt().kd = RGB(0); pared_fr->mt().ks = RGB(0.8);
   shared_ptr<Object> luz_up (new FinitePlane( Point(0,3.9,0) , Direction(2,0,0), Direction(0,0,2) ));
-  luz_up->mt().kd = RGB(5); luz_up->emit = true;
+  pared_up->mt().kd = RGB(5); pared_up->emit = true;
 
   shared_ptr<Object> pelota1 ( new Pelota( Point(2, -3, 3), 1) );   pelota1->mt().kd = RGB255(204, 55, 55);
   shared_ptr<Object> pelota2 ( new Pelota( Point(3, -2, -2), 1) );  pelota2->mt().kd = RGB255(55, 204, 55); //pelota2->mt().ks = RGB(0.2);
   shared_ptr<Object> pelota3 ( new Pelota( Point(3, 2, 1), 1) );    pelota3->mt().kd = RGB255(55, 55, 204);
+  pelota1->mt().is_dielectric = true;pelota1->mt().kd = 0;pelota1->mt().ks = 0;pelota1->mt().kt = 0.9;
 
   scn.addObj(pared_fr);
   scn.addObj(pared_iz);
   scn.addObj(pared_de);
   scn.addObj(pared_up);
   scn.addObj(pared_do);
-  scn.addObj(luz_up);
+  //scn.addObj(luz_up);
 
   scn.addObj(pelota1);
   scn.addObj(pelota2);
@@ -57,7 +58,7 @@ int main(){
 
   t0 = clock();
   Tone_Mapper tm = scn.getTImg();
-  tm.apply_tone_mapper(clamp_gamma, tm.getMax()*7/8, 0.6);
+  tm.apply_tone_mapper(clamp_gamma, 255, 0.6);
   tm.exportBMP("render");
   //scn.exportImg("loqsea.bpm");
   t1 = clock();
