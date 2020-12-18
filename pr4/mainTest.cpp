@@ -20,6 +20,7 @@ int main(){
 
   //Camera c(Point(-3, 0, 0), Direction(0,0,1), Direction(0,1,0), Direction(1,0,0));
   Camera c(Point(-14, 0, 0), 140, true);
+  //Camera c(Point(-14, 0, 0), 105, 120, true);
   //Camera c(Point(-14, 0, 0));
 
   Scene scn(c);
@@ -31,18 +32,22 @@ int main(){
   //pared_fr->mt().kd = RGB(0); pared_fr->mt().ks = RGB(0.8);
   shared_ptr<Object> luz_up (new FinitePlane( Point(0,3.9,0) , Direction(2,0,0), Direction(0,0,2) ));
   pared_up->mt().kd = RGB(5); pared_up->emit = true;
+  shared_ptr<Object> espejo (new FinitePlane( Point(2,0,2) , Direction(0,6,0), Direction(3,0,-3) ));
+  espejo->mt().ks = RGB(0.7); espejo->mt().kd = RGB(0.1);
+  /*pared_do->mt().ks = RGB(0.2);*/ pared_do->mt().kd = RGB255(150, 74, 74);
 
-  shared_ptr<Object> pelota1 ( new Pelota( Point(2, -3, 3), 1) );   pelota1->mt().kd = RGB255(204, 55, 55);
+  shared_ptr<Object> pelota1 ( new Pelota( Point(1, -3, 0), 1) );   pelota1->mt().kd = RGB255(204, 55, 55);
   shared_ptr<Object> pelota2 ( new Pelota( Point(3, -2, -2), 1) );  pelota2->mt().kd = RGB255(55, 204, 55); //pelota2->mt().ks = RGB(0.2);
   shared_ptr<Object> pelota3 ( new Pelota( Point(3, 2, 1), 1) );    pelota3->mt().kd = RGB255(55, 55, 204);
-  pelota1->mt().is_dielectric = true;pelota1->mt().kd = 0;pelota1->mt().ks = 0;pelota1->mt().kt = 0.9;
+  pelota1->mt().is_dielectric = true; pelota1->mt().kd = 0; pelota1->mt().ks = 0; pelota1->mt().kt = 0.9;
+  pelota2->mt().ks = RGB(0.35);
 
   scn.addObj(pared_fr);
   scn.addObj(pared_iz);
   scn.addObj(pared_de);
   scn.addObj(pared_up);
   scn.addObj(pared_do);
-  //scn.addObj(luz_up);
+  scn.addObj(espejo);
 
   scn.addObj(pelota1);
   scn.addObj(pelota2);
@@ -50,7 +55,7 @@ int main(){
 
 
   t0 = clock();
-  scn.PathTracing(800, 800, 80);
+  scn.PathTracing(1200, 1200, 100);
   //scn.PathTracing(600, 600, 40);
   t1 = clock();
   read_time = (double(t1-t0)/CLOCKS_PER_SEC);
@@ -60,6 +65,7 @@ int main(){
   Tone_Mapper tm = scn.getTImg();
   tm.apply_tone_mapper(clamp_gamma, 255, 0.6);
   tm.exportBMP("render");
+  scn.exportHDR("render");
   //scn.exportImg("loqsea.bpm");
   t1 = clock();
   read_time = (double(t1-t0)/CLOCKS_PER_SEC);
