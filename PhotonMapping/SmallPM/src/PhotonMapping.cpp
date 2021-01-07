@@ -4,9 +4,9 @@ Copyright (C) 2014 Diego Gutierrez (diegog@unizar.es)
 All rights reserved.
 
 This is an educational Ray Tracer developed for the course 'Informatica Grafica'
-(Computer Graphics) tought at Universidad de Zaragoza (Spain). As such, it does not 
+(Computer Graphics) tought at Universidad de Zaragoza (Spain). As such, it does not
 intend to be fast or general, but just to provide an educational tool for undergraduate
-students. 
+students.
 
 This software is provided as is, and any express or implied warranties are disclaimed.
 In no event shall copyright holders be liable for any damage.
@@ -17,6 +17,23 @@ In no event shall copyright holders be liable for any damage.
 #include "Ray.h"
 #include "BSDF.h"
 
+#include <cmath>
+
+#include <cstdlib>
+#include <ctime>
+static bool const dummy = (srand(time(NULL)), true);
+float rand0_1() {
+  return (float) rand() / (RAND_MAX);
+}
+float rand0_N(int i) {
+  return (float) rand() / (RAND_MAX/i);
+}
+
+template<typename Base, typename T>
+inline bool instanceof(const T*) {
+   return is_base_of<Base, T>::value;
+}
+
 //*********************************************************************
 // Compute the photons by tracing the Ray 'r' from the light source
 // through the scene, and by storing the intersections with matter
@@ -24,15 +41,25 @@ In no event shall copyright holders be liable for any damage.
 // photons respectively. For efficiency, both are computed at the same
 // time, since computing them separately would result into a lost of
 // several samples marked as caustic or diffuse.
-// Same goes with the boolean 'direct', that specifies if direct 
-// photons (from light to surface) are being stored or not. 
+// Same goes with the boolean 'direct', that specifies if direct
+// photons (from light to surface) are being stored or not.
 // The initial traced photon has energy defined by the tristimulus
 // 'p', that accounts for the emitted power of the light source.
 // The function will return true when there are more photons (caustic
 // or diffuse) to be shot, and false otherwise.
+// boolean 'direct' replaced by enum tr_store:
+//				NORMAL (like before w/ direct = false)
+//				INCLUDE_DIRECT (like before w/ direct = true)
+//				DIRECT_ONLY (only stores first photon (light to surface))
 //---------------------------------------------------------------------
-bool PhotonMapping::trace_ray(const Ray& r, const Vector3 &p, 
+bool PhotonMapping::trace_ray(const Ray& r, const Vector3 &p,
 			   std::list<Photon> &global_photons, std::list<Photon> &caustic_photons, bool direct)
+{
+	return trace_ray(r,p,global_photons,caustic_photons, direct ? tr_store::NORMAL: tr_store::INCLUDE_DIRECT);
+}
+
+bool PhotonMapping::trace_ray(const Ray& r, const Vector3 &p,
+			   std::list<Photon> &global_photons, std::list<Photon> &caustic_photons, tr_store ts)
 {
 
 	//Check if max number of shots done...
@@ -40,10 +67,10 @@ bool PhotonMapping::trace_ray(const Ray& r, const Vector3 &p,
 	{
 		return false;
 	}
-	
+
 	// Compute irradiance photon's energy
 	Vector3 energy(p);
-	
+
 	Ray photon_ray(r);
 	photon_ray.shift();
 
@@ -66,24 +93,24 @@ bool PhotonMapping::trace_ray(const Ray& r, const Vector3 &p,
 			// Don't store the photon!
 			is_caustic_particle = true;
 		}
-		else if (photon_ray.get_level() > 0 || direct)
+		else if (photon_ray.get_level() > 0 || ts != tr_store::NORMAL)
 		{
 			//If non-delta material, store the photon!
-			if( is_caustic_particle )	
-			{				
+			if( is_caustic_particle )
+			{
 				//If caustic particle, store in caustics
 				if( caustic_photons.size() < m_nb_caustic_photons )
 					caustic_photons.push_back( Photon(it.get_position(), photon_ray.get_direction(), energy ));
 			}
-			else						
+			else
 			{
 				//If non-caustic particle, store in global
 				if( global_photons.size() < m_nb_global_photons )
 					global_photons.push_back( Photon(it.get_position(), photon_ray.get_direction(), energy ));
 			}
 			is_caustic_particle = false;
-		}	
-		
+		}
+
 		Real pdf;
 
 		Vector3 surf_albedo = it.intersected()->material()->get_albedo(it);
@@ -92,10 +119,13 @@ bool PhotonMapping::trace_ray(const Ray& r, const Vector3 &p,
 		Real epsilon2 = static_cast<Real>(rand())/static_cast<Real>(RAND_MAX);
 		while (epsilon2 < 0.)
 			epsilon2 = static_cast<Real>(rand())/static_cast<Real>(RAND_MAX);
-		
-		if (epsilon2 > avg_surf_albedo || photon_ray.get_level() > 20 ) 
+
+		if (epsilon2 > avg_surf_albedo || photon_ray.get_level() > 20 )
 			break;
-			
+
+		if (ts == tr_store::DIRECT_ONLY && !is_caustic_particle && photon_ray.get_level() > 1)
+			break;
+
 		// Random walk's next step
 		// Get sampled direction plus pdf, and update attenuation
 		it.intersected()->material()->get_outgoing_sample_ray(it, photon_ray, pdf );
@@ -103,12 +133,12 @@ bool PhotonMapping::trace_ray(const Ray& r, const Vector3 &p,
 		// Shade...
 		energy = energy*surf_albedo;
 		if( !it.intersected()->material()->is_delta() )
-			energy *= dot_abs(it.get_normal(), photon_ray.get_direction())/3.14159;		
+			energy *= dot_abs(it.get_normal(), photon_ray.get_direction())/3.14159;
 
 		energy = energy /(pdf*avg_surf_albedo);
 	}
-	
-	if( caustic_photons.size() == m_nb_caustic_photons && 
+
+	if( caustic_photons.size() == m_nb_caustic_photons &&
 		global_photons.size() == m_nb_global_photons )
 	{
 		m_max_nb_shots = m_nb_current_shots-1;
@@ -129,18 +159,65 @@ bool PhotonMapping::trace_ray(const Ray& r, const Vector3 &p,
 //		the function 'trace_ray' for this purpose.
 //	3 - Finally, once all the photons have been shot, you'll
 //		need to build the photon maps, that will be used later
-//		for rendering. 
+//		for rendering.
 //		NOTE: Careful with function
 //---------------------------------------------------------------------
 void PhotonMapping::preprocess()
 {
+	std::list<Photon> global_photons, caustic_photons;
+
+	int photon_per_light = m_max_nb_shots / world->nb_lights();
+
+	for (LightSource* ls : world -> light_source_list ) {
+
+
+		Vector3 point, dir, power;
+		Real pdf;
+		Ray r;
+
+		do {
+			if (instanceof<PointLightSource>(ls)) {
+
+				float phi = 2*M_PI*rand0_1(),
+							theta = acos(sqrt(1-rand0_1()));
+
+				dir = Vector3(sin(theta)*cos(phi), sin(theta)*sin(phi), cos(theta));
+
+				pdf = 1 / (4 * M_PI);
+				point = ls -> get_position();
+			} else if (false){} //<----   Other light types go here
+
+			r = Ray(point, dir);
+			power = ls -> get_intensities() / (photon_per_light * pdf);
+
+		} while (trace_ray(r, power, global_photons, caustic_photons, tr_store::NORMAL));
+
+	}
+
+	for (Photon ph : global_photons) {
+		std::vector<Real> pos(3);
+		pos[0] = ph.position.data[0];
+		pos[1] = ph.position.data[1];
+		pos[2] = ph.position.data[2];
+		m_global_map.store(pos, ph);
+	}
+	if (!global_photons.empty()) m_global_map.balance();
+
+	for (Photon ph : caustic_photons) {
+		std::vector<Real> pos(3);
+		pos[0] = ph.position.data[0];
+		pos[1] = ph.position.data[1];
+		pos[2] = ph.position.data[2];
+		m_caustics_map.store(pos, ph);
+	}
+	if (!caustic_photons.empty()) m_caustics_map.balance();
 }
 
 //*********************************************************************
-// TODO: Implement the function that computes the rendering equation 
+// TODO: Implement the function that computes the rendering equation
 // using radiance estimation with photon mapping, using the photon
 // maps computed as a proprocess. Note that you will need to handle
-// both direct and global illumination, together with recursive the 
+// both direct and global illumination, together with recursive the
 // recursive evaluation of delta materials. For an optimal implemen-
 // tation you should be able to do it iteratively.
 // In principle, the class is prepared to perform radiance estimation
@@ -154,9 +231,9 @@ Vector3 PhotonMapping::shade(Intersection &it0)const
 
 	//**********************************************************************
 	// The following piece of code is included here for two reasons: first
-	// it works as a 'hello world' code to check that everthing compiles 
-	// just fine, and second, to illustrate some of the functions that you 
-	// will need when doing the work. Goes without saying: remove the 
+	// it works as a 'hello world' code to check that everthing compiles
+	// just fine, and second, to illustrate some of the functions that you
+	// will need when doing the work. Goes without saying: remove the
 	// pieces of code that you won't be using.
 	//
 	unsigned int debug_mode = 1;
@@ -175,7 +252,7 @@ Vector3 PhotonMapping::shade(Intersection &it0)const
 		break;
 	case 3:
 		// ----------------------------------------------------------------
-		// Display whether the material is specular (or refractive) 
+		// Display whether the material is specular (or refractive)
 		L = Vector3(it.intersected()->material()->is_delta());
 		break;
 
