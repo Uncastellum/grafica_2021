@@ -6,3 +6,6 @@
 *.ppm
 *.bmp
 pr2/*.zip
+PhotonMapping/Ux/*
+!PhotonMapping/Ux/buildpm.sh
+saves/*
