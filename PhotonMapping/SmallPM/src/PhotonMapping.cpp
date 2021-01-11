@@ -55,7 +55,7 @@ inline bool instanceof(const T*) {
 bool PhotonMapping::trace_ray(const Ray& r, const Vector3 &p,
 			   std::list<Photon> &global_photons, std::list<Photon> &caustic_photons, bool direct)
 {
-	return trace_ray(r,p,global_photons,caustic_photons, direct ? tr_store::NORMAL: tr_store::INCLUDE_DIRECT);
+	return trace_ray(r,p,global_photons,caustic_photons, direct ? tr_store::NORMAL : tr_store::INCLUDE_DIRECT);
 }
 
 bool PhotonMapping::trace_ray(const Ray& r, const Vector3 &p,
@@ -168,14 +168,15 @@ void PhotonMapping::preprocess()
 
 	int photon_per_light = m_max_nb_shots / world->nb_lights();
 
+  // for each light
 	for (LightSource* ls : world -> light_source_list ) {
-
 
 		Vector3 point, dir, power;
 		Real pdf;
 		Ray r;
 
 		do {
+      // muestreo
 			if (instanceof<PointLightSource>(ls)) {
 
 				float phi = 2*M_PI*rand0_1(),
@@ -190,6 +191,7 @@ void PhotonMapping::preprocess()
 			r = Ray(point, dir);
 			power = ls -> get_intensities() / (photon_per_light * pdf);
 
+      //through all scene
 		} while (trace_ray(r, power, global_photons, caustic_photons, tr_store::NORMAL));
 
 	}
@@ -224,10 +226,10 @@ void PhotonMapping::preprocess()
 // using k-nearest neighbors ('m_nb_photons') to define the bandwidth
 // of the kernel.
 //---------------------------------------------------------------------
-Vector3 PhotonMapping::shade(Intersection &it0)const
+Vector3 PhotonMapping::shade(Intersection &it0) const
 {
-	Vector3 L(0);
-	Intersection it(it0);
+  Vector3 L_l(0), L_s(0), L_c(0), L_d(0);
+  Intersection it(it0);
 
 	//**********************************************************************
 	// The following piece of code is included here for two reasons: first
@@ -236,7 +238,7 @@ Vector3 PhotonMapping::shade(Intersection &it0)const
 	// will need when doing the work. Goes without saying: remove the
 	// pieces of code that you won't be using.
 	//
-	unsigned int debug_mode = 1;
+	/*unsigned int debug_mode = 1;
 
 	switch (debug_mode)
 	{
@@ -278,5 +280,32 @@ Vector3 PhotonMapping::shade(Intersection &it0)const
 	// End of exampled code
 	//**********************************************************************
 
-	return L;
+	return L;*/
+
+  if(it.intersected()->material()->is_delta()) {
+    //Compute specular reflection/refraction
+
+  } else {
+    //Compute direct illumination
+    ---
+    //Compute DIFF Reflections
+    //Compute Caustics
+    Real max_distance_g, max_distance_c;
+    Vector3 albedo = it.intersected()->material()->get_albedo(it);
+  	std::vector<Real> pos(3);
+  	std::vector<const KDTree<Photon, 3>::Node *> nodes_global;
+    std::vector<const KDTree<Photon, 3>::Node *> nodes_caustic;
+  	pos[0] = it.get_position().data[0];
+  	pos[1] = it.get_position().data[1];
+  	pos[2] = it.get_position().data[2];
+
+    pm->m_global_map.find(pos, pm->m_nb_photons, nodes_global, max_distance_g);
+    pm->m_caustics_map.find(pos, pm->m_nb_photons, nodes_caustic, max_distance_c);
+
+
+
+  }
+
+
+  return L_l + L_s + L_c + L_d;
 }
