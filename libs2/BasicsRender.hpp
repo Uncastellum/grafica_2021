@@ -64,6 +64,9 @@ struct RGB {
   RGB operator*(RGB i){
     return RGB(red*i.red, green*i.green, blue*i.blue);
   }
+  RGB operator+(RGB i){
+    return RGB(red+i.red, green+i.green, blue+i.blue);
+  }
   RGB operator/(float i){
     return RGB(red/i, green/i, blue/i);
   }
@@ -128,4 +131,11 @@ public:
   }
 
   virtual void doItSpecial() {}
+};
+
+class LightPoint{
+public:
+  Point point;
+  float force;
+  LightPoint(Point& p) : point(p){}
 };

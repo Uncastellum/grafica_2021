@@ -82,6 +82,7 @@ class Scene {
 private:
   Camera c;
   vector<shared_ptr<Object>> objs;
+  vector<LightPoint> lps;
   Image out_img;
 
 public:
@@ -95,6 +96,9 @@ public:
   }
   void addObj(const shared_ptr<Object>& obj) {
     objs.push_back(obj);
+  }
+  void addLight(const LightPoint lp){
+    lps.push_back(lp);
   }
 
   void exportImg(string file){
@@ -176,9 +180,31 @@ public:
     }
   }
 
+  RGB getDirect(const Ray& r){
+    Ray r_aux;
+    r_aux.orig = r.orig;
+    RGB direct(0);
+    for (int k = 0; k < lps.size(); k++) {
+      r_aux.dir = lps[k].point - r.orig;
+      bool contribute = true;
+      for (int j = 0; j < objs.size(); j++) {
+        float z,zz; Direction zzz;
+        if( objs[j]->intersection(r_aux, z,zz,zzz) ){
+          contribute = false;
+          break;
+        }
+      }
+      if (contribute) {
+        Direction d = lps[k].point - r.orig;
+        direct = direct + RGB(lps[k].force)/(d[xi]*d[xi] + d[yj]*d[yj] + d[zk]*d[zk]);
+      }
+    }
+    return direct;
+  }
 
   RGB find_path(const Ray& ray){
-    RGB resul(1);
+    RGB throughput(1);
+    RGB direct(0);
     Ray luz_refl = ray;
 
     while(true){
@@ -201,16 +227,13 @@ public:
       if (isnan(n[xi])){cerr<< "err nan" << endl; break;}
 
       // Si no interseccion, fin. Si es emisor, devolvemos ya su emision
-      if (intersects==nullptr) return resul*0;
-      if (intersects -> emit) return resul*(intersects->mt()).kd;
+      if (intersects==nullptr) return RGB(0); //throughput*0
+      if (intersects -> emit) return throughput*(intersects->mt()).kd + direct;
 
       // 3. Creamos sys_ref (hemiesfera) y mtx cambio coor
       Point o = luz_refl.orig + luz_refl.dir*dist_obj;
       Direction localsys[3];
       localsys[1] = n;
-      /*localsys[0] = crossProduct(Direction(0,0,1), n).normalize();
-      if (localsys[0].modulus() == 0) localsys[0] = crossProduct(Direction(1,0,0), n).normalize();
-      localsys[2] = crossProduct(localsys[0], n).normalize();*/
       revisedONB(localsys[1], localsys[0], localsys[2]);
       Matrix to_global(localsys[0], localsys[1], localsys[2], o);
 
@@ -229,6 +252,9 @@ public:
           sum = pd + ps;
         }
 
+        //Correccion en punto
+        luz_inc.orig = luz_inc.orig + n*0.02;
+
         // 4.2 RR -> event¿?
         float ev = rand0_1();
         if (ev <= pd) { // diff
@@ -242,19 +268,20 @@ public:
           );
 
           luz_inc.dir = to_global*d0;
-          resul = resul * (mt->kd/pd);
-        } else if(pd < ev  && ev < (sum)) { // specular
+          throughput = throughput * (mt->kd/pd);
+          direct = direct + throughput*getDirect(luz_inc);
+        } else if(/*pd < ev  &&*/ ev < (sum)) { // specular
           Direction wo = luz_refl.dir;
           Direction wr = wo - n*2*(dotProduct(wo, n));
 
           luz_inc.setdirnorm(wr);
-          resul = resul * (mt->ks/ps);
+          throughput = throughput * (mt->ks/ps);
         } else { // ev_ignored
           // Matar rayo
-          return resul*0;
+          return throughput*0;
         }
-        //Correccion en punto
-        luz_inc.orig = luz_inc.orig + n*0.02;
+
+        // Rayo nuevo => Rayo siguiente
         luz_refl = luz_inc;
       } else { // 4.0 (dielectric)
         // 4.1.1 Calculo de fresnel
@@ -297,11 +324,11 @@ public:
           Direction wr = wo - n*2*(dotProduct(wo, n));
 
           luz_inc.dir = wr;
-          resul = resul * (ks/ps);
+          throughput = throughput * (ks/ps);
           //Correccion en punto
           luz_inc.orig = luz_inc.orig + n*0.02;
           luz_refl = luz_inc;
-        } else if(ps < ev  && ev < sum) { // specular ps < ev  && ev < (sum)
+        } else if(ps < ev  && ev < sum) { // refrac ps < ev  && ev < (sum)
           Direction wo = luz_refl.dir;
           float cosi = dotProduct(wo, n);
           if (cosi<-1) cosi = -1;
@@ -316,13 +343,13 @@ public:
           else{wt = (wo*eta) + (n2*(eta * cosi - sqrtf(k)));}
 
           luz_inc.dir = wt;
-          resul = resul * (kt/pt);
+          throughput = throughput * (kt/pt);
           //Correccion en punto
           luz_inc.orig = luz_inc.orig + neg(n2)*0.02;
           luz_refl = luz_inc;
         } else { // ev_ignored
           // Matar rayo
-          return resul*0;
+          return throughput*0;
         }
       }
     }
@@ -330,7 +357,7 @@ public:
     // No deberia llegar aqui nunca
     cout << "- - SOCORRO - -" << endl;
     // 5. return acumm
-    return resul;
+    return throughput;
   }
 
   void PathTracing(const int x, const int y, const int rppx){
