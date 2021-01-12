@@ -180,24 +180,26 @@ public:
     }
   }
 
-  RGB getDirect(const Ray& r){
+  RGB getDirect(const Point& p){
     Ray r_aux;
-    r_aux.orig = r.orig;
+    r_aux.orig = p;
     RGB direct(0);
+
     for (int k = 0; k < lps.size(); k++) {
-      r_aux.dir = lps[k].point - r.orig;
+      Direction dist = lps[k].point - r_aux.orig;
+      float mod = dist.modulus();
+      if (mod == 0.0) continue; //caso extraño
+      r_aux.setdirnorm(dist/mod);
       bool contribute = true;
-      for (int j = 0; j < objs.size(); j++) {
-        float z,zz; Direction zzz;
-        if( objs[j]->intersection(r_aux, z,zz,zzz) ){
-          contribute = false;
-          break;
+
+      for (int j = 0; j < objs.size() && contribute; j++) {
+        float t, z; Direction zz;
+        if( objs[j]->intersection(r_aux, t, z, zz) ){
+          if(t <= mod) contribute = false;
         }
       }
-      if (contribute) {
-        Direction d = lps[k].point - r.orig;
-        direct = direct + RGB(lps[k].force)/(d[xi]*d[xi] + d[yj]*d[yj] + d[zk]*d[zk]);
-      }
+
+      if (contribute) direct = direct + lps[k].force / (mod*mod);
     }
     return direct;
   }
@@ -268,8 +270,8 @@ public:
           );
 
           luz_inc.dir = to_global*d0;
+          direct = direct + throughput*getDirect(luz_inc.orig);
           throughput = throughput * (mt->kd/pd);
-          direct = direct + throughput*getDirect(luz_inc);
         } else if(/*pd < ev  &&*/ ev < (sum)) { // specular
           Direction wo = luz_refl.dir;
           Direction wr = wo - n*2*(dotProduct(wo, n));

@@ -136,6 +136,6 @@ public:
 class LightPoint{
 public:
   Point point;
-  float force;
-  LightPoint(Point& p) : point(p){}
+  RGB force;
+  LightPoint(Point p) : point(p){ force = RGB(1); }
 };
