@@ -16,6 +16,7 @@ In no event shall copyright holders be liable for any damage.
 #include "Intersection.h"
 #include "Ray.h"
 #include "BSDF.h"
+#include "globals.h"
 
 #include <cmath>
 
@@ -230,82 +231,67 @@ Vector3 PhotonMapping::shade(Intersection &it0) const
 {
   Vector3 L_l(0), L_s(0), L_c(0), L_d(0);
   Intersection it(it0);
+  Vector3 kd = it.intersected()->material()->get_albedo(it);
 
-	//**********************************************************************
-	// The following piece of code is included here for two reasons: first
-	// it works as a 'hello world' code to check that everthing compiles
-	// just fine, and second, to illustrate some of the functions that you
-	// will need when doing the work. Goes without saying: remove the
-	// pieces of code that you won't be using.
-	//
-	/*unsigned int debug_mode = 1;
+  //Compute direct illumination
+  for (LightSource* light : world->light_source_list) {
+    if (instanceof<PointLightSource>(light)) {
 
-	switch (debug_mode)
-	{
-	case 1:
-		// ----------------------------------------------------------------
-		// Display Albedo Only
-		L = it.intersected()->material()->get_albedo(it);
-		break;
-	case 2:
-		// ----------------------------------------------------------------
-		// Display Normal Buffer
-		L = it.get_normal();
-		break;
-	case 3:
-		// ----------------------------------------------------------------
-		// Display whether the material is specular (or refractive)
-		L = Vector3(it.intersected()->material()->is_delta());
-		break;
+      Vector3 wi = light->get_incoming_direction(it.get_position()).normalize() * -1;
 
-	case 4:
-		// ----------------------------------------------------------------
-		// Display incoming illumination from light(0)
-		L = world->light(0).get_incoming_light(it.get_position());
-		break;
+      L_l = L_l + light->get_incoming_light(it.get_position()) *
+            kd / M_PI * it.get_normal().dot_abs(wi);
 
-	case 5:
-		// ----------------------------------------------------------------
-		// Display incoming direction from light(0)
-		L = world->light(0).get_incoming_direction(it.get_position());
-		break;
+    } else {;} //Other light type
+  }
 
-	case 6:
-		// ----------------------------------------------------------------
-		// Check Visibility from light(0)
-		if (world->light(0).is_visible(it.get_position()))
-			L = Vector3(1.);
-		break;
-	}
-	// End of exampled code
-	//**********************************************************************
+  //Compute DIFF Reflections && Caustics
+  Real max_distance_g, max_distance_c;
+  std::vector<Real> pos(3);
+  std::vector<const KDTree<Photon, 3>::Node *> nodes_global;
+  std::vector<const KDTree<Photon, 3>::Node *> nodes_caustic;
+  pos[0] = it.get_position().data[0];
+  pos[1] = it.get_position().data[1];
+  pos[2] = it.get_position().data[2];
 
-	return L;*/
+  m_global_map.find(pos, m_nb_photons, nodes_global, max_distance_g);
+  m_caustics_map.find(pos, m_nb_photons, nodes_caustic, max_distance_c);
 
-  if(it.intersected()->material()->is_delta()) {
-    //Compute specular reflection/refraction
+  Real c_area = M_PI * max_distance_c * max_distance_c,
+       g_area = M_PI * max_distance_g * max_distance_g;
 
-  } else {
-    //Compute direct illumination
-    ---
-    //Compute DIFF Reflections
-    //Compute Caustics
-    Real max_distance_g, max_distance_c;
-    Vector3 albedo = it.intersected()->material()->get_albedo(it);
-  	std::vector<Real> pos(3);
-  	std::vector<const KDTree<Photon, 3>::Node *> nodes_global;
-    std::vector<const KDTree<Photon, 3>::Node *> nodes_caustic;
-  	pos[0] = it.get_position().data[0];
-  	pos[1] = it.get_position().data[1];
-  	pos[2] = it.get_position().data[2];
+  for (const KDTree<Photon, 3>::Node* p : nodes_global) {
 
-    pm->m_global_map.find(pos, pm->m_nb_photons, nodes_global, max_distance_g);
-    pm->m_caustics_map.find(pos, pm->m_nb_photons, nodes_caustic, max_distance_c);
-
-
+    Photon ph = p -> data();
+    L_d = L_d + ph.flux * kd / g_area;
 
   }
 
+  for (const KDTree<Photon, 3>::Node* p : nodes_caustic) {
+
+    Photon ph = p -> data();
+    L_c = L_c + ph.flux * kd / c_area;
+
+  }
+
+
+  //Compute specular reflection/refraction
+  Vector3 W(1);
+  if(it.intersected()->material()->is_delta()) {
+    for (size_t i = 0; i < MAX_NB_SPECULAR_BOUNCES; i++) {
+      Ray r;
+  		float pdf;
+      it.intersected()->material()->get_outgoing_sample_ray(it, r, pdf);
+      W = W * kd / pdf;
+      r.shift();
+  		world->first_intersection(r, it);
+    }
+
+    L_s = L_l + L_c + L_d;
+    L_l = Vector3(0); L_c = Vector3(0); L_d = Vector3(0);
+    L_s = L_s * W;
+
+  }
 
   return L_l + L_s + L_c + L_d;
 }
