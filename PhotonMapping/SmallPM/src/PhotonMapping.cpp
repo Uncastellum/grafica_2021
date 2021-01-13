@@ -234,7 +234,8 @@ Vector3 PhotonMapping::shade(Intersection &it0) const
   Vector3 kd = it.intersected()->material()->get_albedo(it);
 
   //Compute direct illumination
-  for (LightSource* light : world->light_source_list) {
+  L_l = kd/M_PI;
+  /*for (LightSource* light : world->light_source_list) {
     if (instanceof<PointLightSource>(light)) {
 
       Vector3 wi = light->get_incoming_direction(it.get_position()).normalize() * -1;
@@ -243,7 +244,7 @@ Vector3 PhotonMapping::shade(Intersection &it0) const
             kd / M_PI * it.get_normal().dot_abs(wi);
 
     } else {;} //Other light type
-  }
+  }*/
 
   //Compute DIFF Reflections && Caustics
   Real max_distance_g, max_distance_c;
