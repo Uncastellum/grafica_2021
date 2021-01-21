@@ -229,7 +229,7 @@ public:
       if (isnan(n[xi])){cerr<< "err nan" << endl; break;}
 
       // Si no interseccion, fin. Si es emisor, devolvemos ya su emision
-      if (intersects==nullptr) return RGB(0); //throughput*0
+      if (intersects==nullptr) return RGB(0) + direct; //throughput*0
       if (intersects -> emit) return throughput*(intersects->mt()).kd + direct;
 
       // 3. Creamos sys_ref (hemiesfera) y mtx cambio coor
