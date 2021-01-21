@@ -31,8 +31,9 @@ float rand0_N(int i) {
 }
 
 template<typename Base, typename T>
-inline bool instanceof(const T*) {
-   return is_base_of<Base, T>::value;
+inline bool instanceof(const T* ptr) {
+   //return is_base_of<Base, T>::value;
+   return dynamic_cast<const Base*>(ptr) != nullptr;
 }
 
 //*********************************************************************
@@ -187,7 +188,12 @@ void PhotonMapping::preprocess()
 
 				pdf = 1 / (4 * M_PI);
 				point = ls -> get_position();
-			} else if (false){} //<----   Other light types go here
+			} else if (false){
+        //<----   Other light types go here
+      } else {
+        //cout << "a";
+        break; //unknown
+      }
 
 			r = Ray(point, dir);
 			power = ls -> get_intensities() / (photon_per_light * pdf);
@@ -234,8 +240,8 @@ Vector3 PhotonMapping::shade(Intersection &it0) const
   Vector3 kd = it.intersected()->material()->get_albedo(it);
 
   //Compute direct illumination
-  for ( auto &&light : world->light_source_list) {
-    if (light->get_no_samples()==1) {
+  for (LightSource* light : world->light_source_list) {
+    if(instanceof<PointLightSource>(light)) {
 
       Vector3 wi = light->get_incoming_direction(it.get_position()).normalize() * -1;
       Vector3 wo = it.get_ray().get_direction();
