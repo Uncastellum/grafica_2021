@@ -278,40 +278,44 @@ Vector3 PhotonMapping::shade(Intersection &it0) const
        g_area = M_PI * max_distance_g * max_distance_g;
 
   for (const KDTree<Photon, 3>::Node* p : nodes_global) {
-    Vector3 wo = it.get_ray().get_direction(), wi = p->data().direction * -1;
-		Real alpha = it.intersected()->material()->get_specular(it);
-		Vector3 brdf;
-		Vector3 wr = wi.reflect(it.get_normal());
-		if (alpha == 0. || alpha == INFINITY){
+    Real alpha = it.intersected()->material()->get_specular(it);
+    Photon ph = p -> data();
+    Vector3 brdf;
+
+		if (alpha == 0. || alpha == INFINITY) {
 			//Lambertiano
 			brdf = kd / M_PI;
-		}
-		else{
+		} else {
+      Vector3 wo = it.get_ray().get_direction(), wi = ph.direction * -1;
+  		Vector3 wr = wi.reflect(it.get_normal());
       //Phong
 			Real p_dot = std::max(dot(wo, wr), 0.f);
 			brdf = kd * (alpha + 2) * powf(p_dot, alpha) / (2 * M_PI);
 		}
-		L_d = L_d + p->data().flux * brdf;
+
+		L_d = L_d + ph.flux * brdf;
   }
-  L_d = L_d/g_area;
+  L_d = L_d / g_area;
 
   for (const KDTree<Photon, 3>::Node* p : nodes_caustic) {
-    Vector3 wo = it.get_ray().get_direction(), wi = p->data().direction * -1;
-		Real alpha = it.intersected()->material()->get_specular(it);
-		Vector3 brdf;
-		Vector3 wr = wi.reflect(it.get_normal());
-		if (alpha == 0. || alpha == INFINITY){
-			//Lambertiano
-			brdf = kd / M_PI;
-		}
-		else{
+    Real alpha = it.intersected()->material()->get_specular(it);
+    Photon ph = p -> data();
+    Vector3 brdf;
+
+    if (alpha == 0. || alpha == INFINITY) {
+      //Lambertiano
+      brdf = kd / M_PI;
+    } else {
+      Vector3 wo = it.get_ray().get_direction(), wi = ph.direction * -1;
+      Vector3 wr = wi.reflect(it.get_normal());
       //Phong
-			Real p_dot = std::max(dot(wo, wr), 0.f);
-			brdf = kd * (alpha + 2) * powf(p_dot, alpha) / (2 * M_PI);
-		}
-		L_c = L_c + p->data().flux * brdf;
+      Real p_dot = std::max(dot(wo, wr), 0.f);
+      brdf = kd * (alpha + 2) * powf(p_dot, alpha) / (2 * M_PI);
+    }
+
+    L_c = L_c + ph.flux * brdf;
   }
-  L_c = L_c/c_area;
+  L_c = L_c / c_area;
 
   //Compute specular reflection/refraction
   Vector3 W(1);
@@ -324,7 +328,11 @@ Vector3 PhotonMapping::shade(Intersection &it0) const
       r.shift();
   		world->first_intersection(r, it);
     }
+
+    L_s = L_l + L_c + L_d;
+    L_l = Vector3(0); L_c = Vector3(0); L_d = Vector3(0);
     L_s = L_s * W;
   }
+  
   return L_l + L_s + L_c + L_d;
 }
