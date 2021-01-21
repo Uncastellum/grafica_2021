@@ -176,6 +176,7 @@ void PhotonMapping::preprocess()
 		Vector3 point, dir, power;
 		Real pdf;
 		Ray r;
+    int current_ppl = 0;
 
 		do {
       // muestreo
@@ -198,8 +199,11 @@ void PhotonMapping::preprocess()
 			r = Ray(point, dir);
 			power = ls -> get_intensities() / (photon_per_light * pdf);
 
-      //through all scene
-		} while (trace_ray(r, power, global_photons, caustic_photons, tr_store::NORMAL));
+      //through all scene && each light trace photns assigned
+		} while (
+      trace_ray(r, power, global_photons, caustic_photons, tr_store::NORMAL) &&
+      ++current_ppl < photon_per_light
+    );
 
 	}
 
@@ -239,22 +243,33 @@ Vector3 PhotonMapping::shade(Intersection &it0) const
   Vector3 L_l(0), L_s(0), L_c(0), L_d(0);
   Intersection it(it0);
 
+  if(it.intersected()->material()->is_delta()) {
+    for (size_t i = 0; i < MAX_NB_SPECULAR_BOUNCES; i++) {
+      Ray r;
+  		float pdf;
+      it.intersected()->material()->get_outgoing_sample_ray(it, r, pdf);
+      r.shift();
+  		world->first_intersection(r, it);
+      if (!it.intersected()->material()->is_delta()) break;
+    }
+  }
+
   //Compute direct illumination
   for (LightSource* light : world->light_source_list) {
     if(instanceof<PointLightSource>(light)) {
-
       Vector3 wi = light->get_incoming_direction(it.get_position()).normalize() * -1;
-      Vector3 wo = it.get_ray().get_direction();
-			Vector3 wr = wi.reflect(it.get_normal());
+      // generar sombras entre objeto y luz
 			Vector3 brdf(0);
       Real alpha = it.intersected()->material()->get_specular(it);
-      if (alpha == 0. || alpha == INFINITY)
-      {
-          //Lambertian
-					brdf = get_kd(it) / M_PI;
-      }else{
-          //Phong
-					brdf = get_kd(it) * (alpha + 2) * powf(wo.dot_abs(wr), alpha) / (2 * M_PI);
+
+      if (alpha == 0. || alpha == INFINITY) {
+        //Lambertian
+				brdf = get_kd(it) / M_PI;
+      } else {
+        Vector3 wo = it.get_ray().get_direction();
+        Vector3 wr = wi.reflect(it.get_normal());
+        //Phong
+				brdf = get_kd(it) * (alpha + 2) * powf(wo.dot_abs(wr), alpha) / (2 * M_PI);
       }
       L_l = L_l + ( light->get_incoming_light(it.get_position()) *
             brdf * it.get_normal().dot_abs(wi) );
@@ -318,7 +333,7 @@ Vector3 PhotonMapping::shade(Intersection &it0) const
   L_c = L_c / c_area;
 
   //Compute specular reflection/refraction
-  Vector3 W(1);
+  /*Vector3 W(1);
   if(it.intersected()->material()->is_delta()) {
     for (size_t i = 0; i < MAX_NB_SPECULAR_BOUNCES; i++) {
       Ray r;
@@ -327,12 +342,13 @@ Vector3 PhotonMapping::shade(Intersection &it0) const
       W = W * get_kd(it) / pdf;
       r.shift();
   		world->first_intersection(r, it);
+      if (!it.intersected()->material()->is_delta()) break;
     }
 
     L_s = L_l + L_c + L_d;
     L_l = Vector3(0); L_c = Vector3(0); L_d = Vector3(0);
     L_s = L_s * W;
-  }
+  }*/
 
   return L_l + L_s + L_c + L_d;
 }
