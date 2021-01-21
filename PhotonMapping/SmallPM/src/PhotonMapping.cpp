@@ -179,7 +179,7 @@ void PhotonMapping::preprocess()
 
 		do {
       // muestreo
-			if (ls->get_no_samples()==1) {
+			if (instanceof<PointLightSource>(ls)) {
 
 				float phi = 2*M_PI*rand0_1(),
 							theta = acos(sqrt(1-rand0_1()));
@@ -233,11 +233,11 @@ void PhotonMapping::preprocess()
 // using k-nearest neighbors ('m_nb_photons') to define the bandwidth
 // of the kernel.
 //---------------------------------------------------------------------
+Vector3 get_kd(Intersection const &it) { return it.intersected()->material()->get_albedo(it);}
 Vector3 PhotonMapping::shade(Intersection &it0) const
 {
   Vector3 L_l(0), L_s(0), L_c(0), L_d(0);
   Intersection it(it0);
-  Vector3 kd = it.intersected()->material()->get_albedo(it);
 
   //Compute direct illumination
   for (LightSource* light : world->light_source_list) {
@@ -251,10 +251,10 @@ Vector3 PhotonMapping::shade(Intersection &it0) const
       if (alpha == 0. || alpha == INFINITY)
       {
           //Lambertian
-					brdf = kd / M_PI;
+					brdf = get_kd(it) / M_PI;
       }else{
           //Phong
-					brdf = kd * (alpha + 2) * powf(wo.dot_abs(wr), alpha) / (2 * M_PI);
+					brdf = get_kd(it) * (alpha + 2) * powf(wo.dot_abs(wr), alpha) / (2 * M_PI);
       }
       L_l = L_l + ( light->get_incoming_light(it.get_position()) *
             brdf * it.get_normal().dot_abs(wi) );
@@ -284,13 +284,13 @@ Vector3 PhotonMapping::shade(Intersection &it0) const
 
 		if (alpha == 0. || alpha == INFINITY) {
 			//Lambertiano
-			brdf = kd / M_PI;
+			brdf = get_kd(it) / M_PI;
 		} else {
       Vector3 wo = it.get_ray().get_direction(), wi = ph.direction * -1;
   		Vector3 wr = wi.reflect(it.get_normal());
       //Phong
 			Real p_dot = std::max(dot(wo, wr), 0.f);
-			brdf = kd * (alpha + 2) * powf(p_dot, alpha) / (2 * M_PI);
+			brdf = get_kd(it) * (alpha + 2) * powf(p_dot, alpha) / (2 * M_PI);
 		}
 
 		L_d = L_d + ph.flux * brdf;
@@ -304,13 +304,13 @@ Vector3 PhotonMapping::shade(Intersection &it0) const
 
     if (alpha == 0. || alpha == INFINITY) {
       //Lambertiano
-      brdf = kd / M_PI;
+      brdf = get_kd(it) / M_PI;
     } else {
       Vector3 wo = it.get_ray().get_direction(), wi = ph.direction * -1;
       Vector3 wr = wi.reflect(it.get_normal());
       //Phong
       Real p_dot = std::max(dot(wo, wr), 0.f);
-      brdf = kd * (alpha + 2) * powf(p_dot, alpha) / (2 * M_PI);
+      brdf = get_kd(it) * (alpha + 2) * powf(p_dot, alpha) / (2 * M_PI);
     }
 
     L_c = L_c + ph.flux * brdf;
@@ -324,7 +324,7 @@ Vector3 PhotonMapping::shade(Intersection &it0) const
       Ray r;
   		float pdf;
       it.intersected()->material()->get_outgoing_sample_ray(it, r, pdf);
-      W = W * it.intersected()->material()->get_albedo(it) / pdf;
+      W = W * get_kd(it) / pdf;
       r.shift();
   		world->first_intersection(r, it);
     }
@@ -333,6 +333,6 @@ Vector3 PhotonMapping::shade(Intersection &it0) const
     L_l = Vector3(0); L_c = Vector3(0); L_d = Vector3(0);
     L_s = L_s * W;
   }
-  
+
   return L_l + L_s + L_c + L_d;
 }
