@@ -15,7 +15,8 @@
 using namespace std;
 
 enum t_mapper { clamp, equalization, clamp_equaliz, gamma_curve, clamp_gamma };
-class Tone_Mapper;
+class Tone_Mapper; class Image;
+Image fusion(const Image& i1, const Image& i2);
 
 class Image {
 private:
@@ -25,6 +26,7 @@ private:
   vector<RGB> cached;
   bool empty = false;
   friend class Tone_Mapper;
+  friend Image fusion(const Image& i1, const Image& i2);
 
 public:
   Image() : empty(true) {}
@@ -217,6 +219,50 @@ public:
   }
 
 };
+
+Image fusion(const Image& i1, const Image& i2){
+  int width = i1.width + i2.width;
+  int max_height = i1.height > i2.height ? i1.height : i2.height;
+  int diff = abs((i1.height - i2.height) / 2);
+  Image out(width, max_height);
+  float max = 0;
+  for (size_t it = 0; it < i1.cached.size(); it++) {
+    RGB tp = i1.cached[it];
+    if (tp.red > max) max = tp.red;
+    if (tp.green > max) max = tp.green;
+    if (tp.blue > max) max = tp.blue;
+  }
+  for (size_t it = 0; it < i2.cached.size(); it++) {
+    RGB tp = i2.cached[it];
+    if (tp.red > max) max = tp.red;
+    if (tp.green > max) max = tp.green;
+    if (tp.blue > max) max = tp.blue;
+  }
+  max = max/16;
+  for (int i = 0; i < width*max_height; i++) {
+    out.cached[i] = RGB(max);
+  }
+  if(i1.height > i2.height) {
+    for (size_t i = 0; i < i1.width; i++) {
+      for (size_t j = 0; j < i1.height; j++)
+        out.cached[j*width + i] = i1.cached[j*i1.width + i];
+    }
+    for (size_t i = 0; i < i2.width; i++) {
+      for (size_t j = 0; j < i2.height; j++)
+        out.cached[(j+diff)*width + i + i1.width] = i2.cached[j*i2.width + i];
+    }
+  } else {
+    for (size_t i = 0; i < i1.width; i++) {
+      for (size_t j = 0; j < i1.height; j++)
+        out.cached[(j+diff)*width + i] = i1.cached[j*i1.width + i];
+    }
+    for (size_t i = 0; i < i2.width; i++) {
+      for (size_t j = 0; j < i2.height; j++)
+        out.cached[j*width + i + i1.width] = i2.cached[j*i2.width + i];
+    }
+  }
+  return out;
+}
 
 class Tone_Mapper {
 private:

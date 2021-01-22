@@ -31,7 +31,6 @@ int main(){
   shared_ptr<Object> pared_do (new FinitePlane( Point(0,-4,0), Direction(6,0,0), Direction(0,0,6) ));  pared_do->mt().kd = RGB255(156, 156, 156);
   shared_ptr<Object> ftl (new FinitePlane( Point(3,-3,-3), Direction(1,0.3,0), Direction(0,0,1) ));  ftl->mt().ks = RGB(0.6); ftl->mt().kd = RGB(0.1);
 
-  shared_ptr<Object> luz_up (new FinitePlane( Point(0,3.9,0) , Direction(2,0,0), Direction(0,0,2) ));
   pared_up->mt().kd = RGB(5); pared_up->emit = true;
   shared_ptr<Object> espejo (new FinitePlane( Point(2,0,2) , Direction(0,6,0), Direction(3,0,-3) ));
   espejo->mt().ks = RGB(0.7); espejo->mt().kd = RGB(0.1);
@@ -67,7 +66,7 @@ int main(){
   cout << "RT: " << read_time << " segundos" << endl;
 
   t0 = clock();
-  Tone_Mapper tm = scn.getTImg();
+  Tone_Mapper tm = scn.getTonerImg();
   tm.apply_tone_mapper(clamp_gamma, 255, 0.6);
   tm.exportBMP("render");
   scn.exportHDR("render");

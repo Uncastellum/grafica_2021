@@ -111,7 +111,10 @@ public:
   void exportHDR(string file, int csp){
     out_img.exportHDR(file, csp);
   }
-  Tone_Mapper getTImg(){
+  Image getImg(){
+    return out_img;
+  }
+  Tone_Mapper getTonerImg(){
     return Tone_Mapper(out_img);
   }
 
