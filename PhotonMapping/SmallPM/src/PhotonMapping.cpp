@@ -245,8 +245,7 @@ Vector3 PhotonMapping::shade(Intersection &it0) const
 
   if(it.intersected()->material()->is_delta()) {
     for (size_t i = 0; i < MAX_NB_SPECULAR_BOUNCES; i++) {
-      Ray r;
-  		float pdf;
+      Ray r; float pdf;
       it.intersected()->material()->get_outgoing_sample_ray(it, r, pdf);
       r.shift();
   		world->first_intersection(r, it);
@@ -259,6 +258,16 @@ Vector3 PhotonMapping::shade(Intersection &it0) const
     if(instanceof<PointLightSource>(light)) {
       Vector3 wi = light->get_incoming_direction(it.get_position()).normalize() * -1;
       // generar sombras entre objeto y luz
+      {
+        Intersection aux;
+        Ray raux(it.get_position(), wi);
+        world->first_intersection(raux, aux);
+        if(aux.did_hit()){
+          Real dist_intersection = (aux.get_position() - raux.get_origin()).length();
+          Real dist_light = (light->get_position() - raux.get_origin()).length();
+          if(dist_light >= dist_intersection) break;
+        }
+      }
 			Vector3 brdf(0);
       Real alpha = it.intersected()->material()->get_specular(it);
 
