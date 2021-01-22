@@ -261,19 +261,10 @@ Vector3 PhotonMapping::shade(Intersection &it0, bool radius)
     if(instanceof<PointLightSource>(light)) {
       Vector3 wi = light->get_incoming_direction(it.get_position()).normalize() * -1;
       // generar sombras entre objeto y luz
-      {
-        Intersection aux;
-        Ray raux(it.get_position(), wi);
-        world->first_intersection(raux, aux);
-        if(aux.did_hit()){
-          Real dist_intersection = (aux.get_position() - it.get_position()).length();
-          Real dist_light = (light->get_position() - it.get_position()).length();
-          if(dist_light >= dist_intersection) continue;
-        }
-      }
+      if(!light->is_visible(it.get_position())) continue;
+
 			Vector3 brdf(0);
       Real alpha = it.intersected()->material()->get_specular(it);
-
       if (alpha == 0. || alpha == INFINITY) {
         //Lambertian
 				brdf = get_kd(it) / M_PI;
