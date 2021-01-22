@@ -20,6 +20,7 @@ In no event shall copyright holders be liable for any damage.
 #include "globals.h"
 
 #include "Vector3.h"
+#include "Vector2.h"
 #include "KDTree.h"
 
 class World;
@@ -39,6 +40,7 @@ class PhotonMapping
 
 	unsigned int m_max_nb_shots, m_nb_global_photons, m_nb_caustic_photons;
 	unsigned int m_nb_current_shots;
+	Real radius_g, radius_c;
 
 	unsigned int m_nb_photons;
 	bool m_raytraced_direct;
@@ -76,22 +78,24 @@ class PhotonMapping
 	bool trace_ray(const Ray& r, const Vector3 &p,
 			   std::list<Photon> &global_photons, std::list<Photon> &caustic_photons, tr_store ts);
 public:
-
  	PhotonMapping( World *_world, unsigned int nb_global_photons, unsigned int nb_caustic_photons,
 				   unsigned int max_nb_shots, unsigned int nb_photons, bool raytraced_direct = true):
  		world(_world), m_max_nb_shots(max_nb_shots), m_nb_current_shots(0),
 		m_nb_global_photons(nb_global_photons), m_nb_caustic_photons(nb_caustic_photons),
 		m_nb_photons(nb_photons), m_raytraced_direct(raytraced_direct)
-	{ }
+	{ radius_g = 0.0, radius_c = 0.0; }
 
 	// Preprocess the photon map. This needs to be run before rendering,
 	// or no photons will be stored to compute radiance in the rendering
 	// pass.
 	void preprocess();
 
+	Vector2 getRadius() const;
+	void decreaseRadius();
+
 	// Computes shading at the intersection 'it0' and returns the estimated
 	// radiance.
-	Vector3 shade(Intersection &it0)const;
+	Vector3 shade(Intersection &it0, bool radius);
 };
 
 #endif

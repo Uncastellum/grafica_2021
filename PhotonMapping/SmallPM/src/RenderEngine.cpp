@@ -4,9 +4,9 @@ Copyright (C) 2014 Diego Gutierrez (diegog@unizar.es)
 All rights reserved.
 
 This is an educational Ray Tracer developed for the course 'Informatica Grafica'
-(Computer Graphics) tought at Universidad de Zaragoza (Spain). As such, it does not 
+(Computer Graphics) tought at Universidad de Zaragoza (Spain). As such, it does not
 intend to be fast or general, but just to provide an educational tool for undergraduate
-students. 
+students.
 
 This software is provided as is, and any express or implied warranties are disclaimed.
 In no event shall copyright holders be liable for any damage.
@@ -25,7 +25,7 @@ In no event shall copyright holders be liable for any damage.
 
 using namespace std;
 
-const Vector3 RenderEngine::trace_ray(const Vector2& pi)
+const Vector3 RenderEngine::trace_ray(const Vector2& pi, bool first = false)
 {
 	// NOTE: Vector2 'pi' stores the pixel coordinates in the range
 	//			pi[0] in [0, film->sizex-1], pi[1] in [0, film->sizey-1]
@@ -34,11 +34,11 @@ const Vector3 RenderEngine::trace_ray(const Vector2& pi)
 
 	Intersection it;
 	world->first_intersection(r, it);
-	
-	// Get the ray's first intersection in the scene (if exists)	
+
+	// Get the ray's first intersection in the scene (if exists)
 	if (it.did_hit())
 	{
-		return photon_mapping->shade(it);
+		return photon_mapping->shade(it, first);
 	}
 	else
 		// ... or return background's color if the ray does not intersect.
@@ -53,68 +53,73 @@ void RenderEngine::render(const std::string& name)
 	world->fix();
 	{
 		Real secs = timer.get_secs();
-		int hours = static_cast<int>(secs)/3600; secs -= hours*3600;
 		int minutes = static_cast<int>(secs)/60; secs -= minutes*60;
-		std::cout << "Prepared scene to render: \t["<<hours<<":"<<minutes<<":"<<secs<<"]             \n"; 
+		std::cout << "Prepared scene to render: \t["<<minutes<<":"<<secs<<"]             \n";
 	}
 
-
-	// ----------------------------------------------------------------------
-	// Precompute...
-	cout << "Shooting Photons...\r";
-	timer.start();
-	photon_mapping->preprocess();
-	{
-		Real secs = timer.get_secs();
-		int hours = static_cast<int>(secs)/3600; secs -= hours*3600;
-		int minutes = static_cast<int>(secs)/60; secs -= minutes*60;
-		std::cout << "Photons Shot: \t["<<hours<<":"<<minutes<<":"<<secs<<"]             \n"; 
-	}
-	
-	// ----------------------------------------------------------------------
-	// Start timer and go ...
-	//
-	int x=0;
-	Real weight = 1./(NB_SAMPLES_ANTIALIASING);
-	int sq_samples_aa = sqrtf(static_cast<float>(NB_SAMPLES_ANTIALIASING));
-
-	cout << "Rendering ...\r"; 
-	timer.start();
-
-	// ----------------------------------------------------------------------
-	//Raytrace all samples in the image
-
-	//for all pixels...
-		//trace a ray on each pixel (see function 'RenderEngine::trace_ray()')
+	Vector3 img[film->get_height()][film->get_width()];
 	for (int y=0;y<film->get_height(); ++y)
-	{	
-		if(!(y%10))
+		for( int x=0; x<film->get_width(); ++x)
+			img[y][x] = Vector3(0.0);
+
+	for (size_t its = 0; its < m_it_progressive_pm; its++) {
+		// ----------------------------------------------------------------------
+		// Precompute...
+		cout << "Shooting Photons...\r";
+		timer.start();
+		photon_mapping->preprocess();
 		{
 			Real secs = timer.get_secs();
-			int hours = static_cast<int>(secs)/3600; secs -= hours*3600;
 			int minutes = static_cast<int>(secs)/60; secs -= minutes*60;
-			std::cout << "Rendering ..."
-				<<static_cast<Real>(y)/film->get_height()*100<<"%: \t["<<hours<<":"<<minutes<<":"<<secs<<"]             "<<"\r"; 
+			std::cout << "Photons Shot_" << its+1 <<": \t["<<minutes<<":"<<secs<<"]             \n";
 		}
-		for( int x=0; x<film->get_width(); ++x)
-		{
-			//Get color!
-			Vector3 col = trace_ray(Vector2(x,y));
 
-			//Store the RGB data on film
-			film->draw_pixel(x,y, col);
+		// ----------------------------------------------------------------------
+		// Start timer and go ...
+		//
+		int x=0;
+		Real weight = 1./(NB_SAMPLES_ANTIALIASING);
+		int sq_samples_aa = sqrtf(static_cast<float>(NB_SAMPLES_ANTIALIASING));
+
+		cout << "Rendering ...\r";
+		timer.start();
+
+		// ----------------------------------------------------------------------
+		//Raytrace all samples in the image
+
+		//for all pixels...
+		//trace a ray on each pixel (see function 'RenderEngine::trace_ray()')
+		for (int y=0;y<film->get_height(); ++y)
+		{
+			if(!(y%10))
+			{
+				Real secs = timer.get_secs();
+				int minutes = static_cast<int>(secs)/60; secs -= minutes*60;
+				std::cout << "Rendering ..."
+				<<static_cast<Real>(y)/film->get_height()*100<<"%: \t["<<minutes<<":"<<secs<<"]             "<<"\r";
+			}
+			for( int x=0; x<film->get_width(); ++x)
+			{
+				//Get color!
+				img[y][x] += trace_ray(Vector2(x,y), its != 0);
+
+			}
 		}
+		photon_mapping->decreaseRadius();
+		// ----------------------------------------------------------------------
+		// Rendering finished...
+		Real secs = timer.get_secs();
+		int minutes = static_cast<int>(secs)/60; secs -= minutes*60;
+		cout << "Rendering ..."
+					<<"[DONE]: \t["<<minutes<<":"<<secs<<"]                        "<<"\n";
 	}
 
-	// ----------------------------------------------------------------------
-	// Rendering finished...
-	Real secs = timer.get_secs();
-	int hours = static_cast<int>(secs)/3600; secs -= hours*3600;
-	int minutes = static_cast<int>(secs)/60; secs -= minutes*60;
-	cout << "Rendering ..."
-				<<"[DONE]: \t["<<hours<<":"<<minutes<<":"<<secs<<"]                        "<<"\n"; 
-	
-	
+
+	for (int y=0;y<film->get_height(); ++y)
+		for( int x=0; x<film->get_width(); ++x)
+			//Store the RGB data on film
+			film->draw_pixel(x,y, img[y][x]/m_it_progressive_pm);
+
 	//..., save the image!
 	film->write(name.c_str());
 }

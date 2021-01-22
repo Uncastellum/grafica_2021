@@ -238,11 +238,14 @@ void PhotonMapping::preprocess()
 // of the kernel.
 //---------------------------------------------------------------------
 Vector3 get_kd(Intersection const &it) { return it.intersected()->material()->get_albedo(it);}
-Vector3 PhotonMapping::shade(Intersection &it0) const
+Vector2 PhotonMapping::getRadius() const { return Vector2(radius_g, radius_c); }
+void PhotonMapping::decreaseRadius() { radius_g = radius_g * 2/3; radius_c = radius_c * 2/3;}
+Vector3 PhotonMapping::shade(Intersection &it0, bool radius)
 {
   Vector3 L_l(0), L_s(0), L_c(0), L_d(0);
   Intersection it(it0);
 
+  //Compute specular reflection/refraction
   if(it.intersected()->material()->is_delta()) {
     for (size_t i = 0; i < MAX_NB_SPECULAR_BOUNCES; i++) {
       Ray r; float pdf;
@@ -289,17 +292,28 @@ Vector3 PhotonMapping::shade(Intersection &it0) const
   //Compute DIFF Reflections && Caustics
   Real max_distance_g, max_distance_c;
   std::vector<Real> pos(3);
-  std::vector<const KDTree<Photon, 3>::Node *> nodes_global;
-  std::vector<const KDTree<Photon, 3>::Node *> nodes_caustic;
+  std::list<const KDTree<Photon, 3>::Node *> nodes_global;
+  std::list<const KDTree<Photon, 3>::Node *> nodes_caustic;
   pos[0] = it.get_position().data[0];
   pos[1] = it.get_position().data[1];
   pos[2] = it.get_position().data[2];
 
-  m_global_map.find(pos, m_nb_photons, nodes_global, max_distance_g);
-  m_caustics_map.find(pos, m_nb_photons, nodes_caustic, max_distance_c);
+  if(radius) {
+    //find(const std::vector<Real>& p, Real radius, list<const Node*>* nodes)
+    m_global_map.find(pos, radius_g, &nodes_global);
+    m_caustics_map.find(pos, radius_c, &nodes_caustic);
+  } else {
+    std::vector<const KDTree<Photon, 3>::Node *> aux_global;
+    std::vector<const KDTree<Photon, 3>::Node *> aux_caustic;
+    m_global_map.find(pos, m_nb_photons, aux_global, max_distance_g);
+    m_caustics_map.find(pos, m_nb_photons, aux_caustic, max_distance_c);
+    radius_g = max_distance_g; radius_c = max_distance_c;
+    nodes_global.insert(nodes_global.begin(), aux_global.begin(), aux_global.end());
+    nodes_caustic.insert(nodes_caustic.begin(), aux_caustic.begin(), aux_caustic.end());
+  }
 
-  Real c_area = M_PI * max_distance_c * max_distance_c,
-       g_area = M_PI * max_distance_g * max_distance_g;
+  Real g_area = M_PI * radius_g * radius_g,
+       c_area = M_PI * radius_c * radius_c;
 
   for (const KDTree<Photon, 3>::Node* p : nodes_global) {
     Real alpha = it.intersected()->material()->get_specular(it);
@@ -340,24 +354,6 @@ Vector3 PhotonMapping::shade(Intersection &it0) const
     L_c = L_c + ph.flux * brdf;
   }
   L_c = L_c / c_area;
-
-  //Compute specular reflection/refraction
-  /*Vector3 W(1);
-  if(it.intersected()->material()->is_delta()) {
-    for (size_t i = 0; i < MAX_NB_SPECULAR_BOUNCES; i++) {
-      Ray r;
-  		float pdf;
-      it.intersected()->material()->get_outgoing_sample_ray(it, r, pdf);
-      W = W * get_kd(it) / pdf;
-      r.shift();
-  		world->first_intersection(r, it);
-      if (!it.intersected()->material()->is_delta()) break;
-    }
-
-    L_s = L_l + L_c + L_d;
-    L_l = Vector3(0); L_c = Vector3(0); L_d = Vector3(0);
-    L_s = L_s * W;
-  }*/
 
   return L_l + L_s + L_c + L_d;
 }

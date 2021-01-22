@@ -4,9 +4,9 @@ Copyright (C) 2014 Diego Gutierrez (diegog@unizar.es)
 All rights reserved.
 
 This is an educational Ray Tracer developed for the course 'Informatica Grafica'
-(Computer Graphics) tought at Universidad de Zaragoza (Spain). As such, it does not 
+(Computer Graphics) tought at Universidad de Zaragoza (Spain). As such, it does not
 intend to be fast or general, but just to provide an educational tool for undergraduate
-students. 
+students.
 
 This software is provided as is, and any express or implied warranties are disclaimed.
 In no event shall copyright holders be liable for any damage.
@@ -32,7 +32,7 @@ class RenderEngine
 {
 	/// World (containing all objects and lights),
 	World *world;
-	
+
 	/// Film (unto which pixels are drawn).
 	Film* film;
 
@@ -41,22 +41,23 @@ class RenderEngine
 
 	// Photon Mapping Integrator
 	PhotonMapping *photon_mapping;
+	unsigned int m_it_progressive_pm;
 
 	/// Trace a single ray
-	const Vector3 trace_ray(const Vector2& pi);
-		
+	const Vector3 trace_ray(const Vector2& pi, bool first);
+
 public:
 
 	/** Build engine from world information, a Film and a camera. */
- 	RenderEngine(World*  _world, Film* _film, Camera* _camera, PhotonMapping *_pm): 
- 		world(_world), film(_film), camera(_camera), photon_mapping(_pm)
+ 	RenderEngine(World*  _world, Film* _film, Camera* _camera, PhotonMapping *_pm,
+		unsigned int _m_it_progressive_pm = 5):
+ 		world(_world), film(_film), camera(_camera), photon_mapping(_pm), m_it_progressive_pm(_m_it_progressive_pm)
 	{
-		srand((unsigned)time(0));	
+		srand((unsigned)time(0));
 	}
-	
+
 	void render(const std::string& name);
 
 };
 
 #endif
-
