@@ -261,6 +261,7 @@ Vector3 PhotonMapping::shade(Intersection &it0) const
       {
         Intersection aux;
         Ray raux(it.get_position(), wi);
+        raux.shift();
         world->first_intersection(raux, aux);
         if(aux.did_hit()){
           Real dist_intersection = (aux.get_position() - it.get_position()).length();
