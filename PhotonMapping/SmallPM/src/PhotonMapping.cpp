@@ -263,9 +263,9 @@ Vector3 PhotonMapping::shade(Intersection &it0) const
         Ray raux(it.get_position(), wi);
         world->first_intersection(raux, aux);
         if(aux.did_hit()){
-          Real dist_intersection = (aux.get_position() - raux.get_origin()).length();
-          Real dist_light = (light->get_position() - raux.get_origin()).length();
-          if(dist_light >= dist_intersection) break;
+          Real dist_intersection = (aux.get_position() - it.get_position()).length();
+          Real dist_light = (light->get_position() - it.get_position()).length();
+          if(dist_light >= dist_intersection) continue;
         }
       }
 			Vector3 brdf(0);
