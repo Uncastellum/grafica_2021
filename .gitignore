@@ -8,4 +8,5 @@
 pr2/*.zip
 PhotonMapping/Ux/*
 !PhotonMapping/Ux/buildpm.sh
+!PhotonMapping/Ux/bunny.obj
 saves/*

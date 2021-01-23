@@ -118,6 +118,7 @@ void RenderEngine::render(const std::string& name)
 		photon_mapping->clearPhotons();
 	}
 
+	std::cout << "All shots DONE.\n";
 
 	for (int y=0;y<film->get_height(); ++y)
 		for( int x=0; x<film->get_width(); ++x)
