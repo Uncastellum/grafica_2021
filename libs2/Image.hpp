@@ -269,6 +269,9 @@ private:
   Image i;
 public:
   Tone_Mapper(Image i_) : i(i_){}
+  Image getImage() {
+    return i;
+  }
   void exportLDR(string file){
     i.exportLDR(file);
   }
