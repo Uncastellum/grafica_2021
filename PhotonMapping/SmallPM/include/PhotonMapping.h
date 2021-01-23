@@ -90,8 +90,13 @@ public:
 	// pass.
 	void preprocess();
 
-	Vector2 getRadius() const;
-	void decreaseRadius();
+	Vector2 getRadius() const { return Vector2(radius_g, radius_c); }
+	void decreaseRadius() { radius_g = radius_g * 2/3; radius_c = radius_c * 2/3;}
+	void clearPhotons() {
+	  m_global_map.clear(); m_caustics_map.clear();
+	  m_nb_current_shots = 0;
+	  //if(radius_c == 0) radius_c = radius_g; //radius_c = inf capado
+	}
 
 	// Computes shading at the intersection 'it0' and returns the estimated
 	// radiance.

@@ -49,12 +49,12 @@ void RenderEngine::render(const std::string& name)
 {
 	Timer timer;timer.start();
 
-	cout << "Preparing scene to be rendered...\r";
+	cout << "Preparing scene to be rendered...\n";
 	world->fix();
 	{
 		Real secs = timer.get_secs();
 		int minutes = static_cast<int>(secs)/60; secs -= minutes*60;
-		std::cout << "Prepared scene to render: \t["<<minutes<<":"<<secs<<"]             \n";
+		std::cout << "Prepared scene: \t["<<minutes<<":"<<secs<<"]             \n";
 	}
 
 	Vector3 img[film->get_height()][film->get_width()];
@@ -95,23 +95,27 @@ void RenderEngine::render(const std::string& name)
 			{
 				Real secs = timer.get_secs();
 				int minutes = static_cast<int>(secs)/60; secs -= minutes*60;
-				std::cout << "Rendering ..."
-				<<static_cast<Real>(y)/film->get_height()*100<<"%: \t["<<minutes<<":"<<secs<<"]             "<<"\r";
+				std::cout << "Rendering ..." << static_cast<Real>(y)/film->get_height()*100
+				<<"%: \t["<<minutes<<":"<<secs<<"]             "<<"\r"<<flush;
 			}
 			for( int x=0; x<film->get_width(); ++x)
 			{
+				//if(its != 0) std::cerr << "x/y: " << x<<"/"<<y << '\n';
 				//Get color!
 				img[y][x] += trace_ray(Vector2(x,y), its != 0);
 
 			}
 		}
-		photon_mapping->decreaseRadius();
+
 		// ----------------------------------------------------------------------
 		// Rendering finished...
 		Real secs = timer.get_secs();
 		int minutes = static_cast<int>(secs)/60; secs -= minutes*60;
 		cout << "Rendering ..."
 					<<"[DONE]: \t["<<minutes<<":"<<secs<<"]                        "<<"\n";
+
+		photon_mapping->decreaseRadius();
+		photon_mapping->clearPhotons();
 	}
 
 

@@ -224,6 +224,7 @@ void PhotonMapping::preprocess()
 		m_caustics_map.store(pos, ph);
 	}
 	if (!caustic_photons.empty()) m_caustics_map.balance();
+  //cerr << "Preprocess: " << m_nb_current_shots << "/" << m_max_nb_shots << endl;
 }
 
 //*********************************************************************
@@ -238,8 +239,6 @@ void PhotonMapping::preprocess()
 // of the kernel.
 //---------------------------------------------------------------------
 Vector3 get_kd(Intersection const &it) { return it.intersected()->material()->get_albedo(it);}
-Vector2 PhotonMapping::getRadius() const { return Vector2(radius_g, radius_c); }
-void PhotonMapping::decreaseRadius() { radius_g = radius_g * 2/3; radius_c = radius_c * 2/3;}
 Vector3 PhotonMapping::shade(Intersection &it0, bool radius)
 {
   Vector3 L_l(0), L_s(0), L_c(0), L_d(0);
@@ -258,6 +257,7 @@ Vector3 PhotonMapping::shade(Intersection &it0, bool radius)
 
   //Compute direct illumination
   for (LightSource* light : world->light_source_list) {
+    if (it.intersected()->material()->is_delta()) break;
     if(instanceof<PointLightSource>(light)) {
       Vector3 wi = light->get_incoming_direction(it.get_position()).normalize() * -1;
       // generar sombras entre objeto y luz
@@ -292,13 +292,13 @@ Vector3 PhotonMapping::shade(Intersection &it0, bool radius)
   if(radius) {
     //find(const std::vector<Real>& p, Real radius, list<const Node*>* nodes)
     m_global_map.find(pos, radius_g, &nodes_global);
-    m_caustics_map.find(pos, radius_c, &nodes_caustic);
+    if(radius_c) m_caustics_map.find(pos, radius_c, &nodes_caustic);
   } else {
-    std::vector<const KDTree<Photon, 3>::Node *> aux_global;
-    std::vector<const KDTree<Photon, 3>::Node *> aux_caustic;
+    std::vector<const KDTree<Photon, 3>::Node *> aux_global, aux_caustic;
     m_global_map.find(pos, m_nb_photons, aux_global, max_distance_g);
     m_caustics_map.find(pos, m_nb_photons, aux_caustic, max_distance_c);
-    radius_g = max_distance_g; radius_c = max_distance_c;
+    if(!isinf(max_distance_g)) radius_g = max_distance_g;
+    if(!isinf(max_distance_c)) radius_c = max_distance_c;
     nodes_global.insert(nodes_global.begin(), aux_global.begin(), aux_global.end());
     nodes_caustic.insert(nodes_caustic.begin(), aux_caustic.begin(), aux_caustic.end());
   }
@@ -344,7 +344,7 @@ Vector3 PhotonMapping::shade(Intersection &it0, bool radius)
 
     L_c = L_c + ph.flux * brdf;
   }
-  L_c = L_c / c_area;
+  if(radius_c) L_c = L_c / c_area;
 
   return L_l + L_s + L_c + L_d;
 }
