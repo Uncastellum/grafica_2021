@@ -241,7 +241,7 @@ void PhotonMapping::preprocess()
 Vector3 get_kd(Intersection const &it) { return it.intersected()->material()->get_albedo(it);}
 Vector3 PhotonMapping::shade(Intersection &it0, bool radius)
 {
-  Vector3 L_l(0), L_s(0), L_c(0), L_d(0);
+  Vector3 L_l(0), L_c(0), L_d(0);
   Intersection it(it0);
 
   //Compute specular reflection/refraction
@@ -346,5 +346,5 @@ Vector3 PhotonMapping::shade(Intersection &it0, bool radius)
   }
   if(radius_c) L_c = L_c / c_area;
 
-  return L_l + L_s + L_c + L_d;
+  return L_l + L_c + L_d;
 }

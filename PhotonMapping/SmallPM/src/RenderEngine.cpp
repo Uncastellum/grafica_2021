@@ -74,12 +74,6 @@ void RenderEngine::render(const std::string& name)
 			std::cout << "Photons Shot_" << its+1 <<": \t["<<minutes<<":"<<secs<<"]             \n";
 		}
 
-		// ----------------------------------------------------------------------
-		// Start timer and go ...
-		//
-		int x=0;
-		Real weight = 1./(NB_SAMPLES_ANTIALIASING);
-		int sq_samples_aa = sqrtf(static_cast<float>(NB_SAMPLES_ANTIALIASING));
 
 		cout << "Rendering ...\r";
 		timer.start();
