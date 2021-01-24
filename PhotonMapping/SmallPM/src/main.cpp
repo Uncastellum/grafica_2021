@@ -171,6 +171,7 @@ int main(int argc, char* argv[])
 		Mesh* bunny = new Mesh("bunny.obj", mirror);
 		w->add_object(bunny);
 	}
+	break;
 	case 4:
 	{
 		Object3D* sphere1 = new Sphere(Vector3(0,0.8,0), 0.6, glass);
