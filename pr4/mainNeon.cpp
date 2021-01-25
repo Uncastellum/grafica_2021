@@ -81,33 +81,33 @@ int main(){
   scn2.addObj(pared_iz);
   shared_ptr<Object> r1 ( new Pelota( Point(1, -4, 3), 1.5) );            r1->mt().kd = RGB255(89, 171, 244);
   shared_ptr<Object> r2 ( new Pelota( Point(0.8, 4, 3.2), 1.3) );         r2->mt().kd = RGB255(104, 224, 117);
-  shared_ptr<Object> r3 ( new Pelota( Point(0, -4, -4), 1.2) );           r3->mt().kd = RGB255(109, 48, 214);
+  shared_ptr<Object> r3 ( new Pelota( Point(0, -4, -4), 1.2) );           r3->mt().kd = RGB255(109, 48, 214); r3->mt().ks = RGB(0.7);
   shared_ptr<Object> r4 ( new Pelota( Point(0.6, 4, -3.5), 1.8) );        r4->mt().kd = RGB255(85, 106, 207);
 
   shared_ptr<Object> r5 ( new Pelota( Point(2.2, 2, -2.2), 1.5) );        r5->mt().kd = RGB255(12, 66, 33);
   shared_ptr<Object> r6 ( new Pelota( Point(2, -4.3, -2.4), 1.5) );       r6->mt().kd = RGB255(50, 228, 214);
   shared_ptr<Object> r7 ( new Pelota( Point(1, -2.4, -3.2), 1.3) );       r7->mt().kd = RGB255(93, 239, 100);
   shared_ptr<Object> r8 ( new Pelota( Point(5, -2, -13.5), 10) );         r8->mt().kd = RGB255(31, 244, 199);
-  shared_ptr<Object> r9 ( new Pelota( Point(2.3, -0.2, -3), 1.3) );       r9->mt().kd = RGB255(49, 109, 209);
+  shared_ptr<Object> r9 ( new Pelota( Point(2.3, -0.2, -3), 1.3) );       r9->mt().kd = RGB255(49, 109, 209); r9->mt().ks = RGB(0.7);
   shared_ptr<Object> r10 ( new Pelota( Point(1.4, 1.6, -4.4), 1.3) );    r10->mt().kd = RGB255(90, 191, 122);
   shared_ptr<Object> r11 ( new Pelota( Point(1, -0.5, -4.4), 1) );       r11->mt().kd = RGB255(124, 17, 104);
 
   shared_ptr<Object> r12 ( new Pelota( Point(2.3, 1.9, 3), 1.8) );       r12->mt().kd = RGB255(241, 25, 66);
   shared_ptr<Object> r13 ( new Pelota( Point(1.8, -2, 3.4), 1.3) );      r13->mt().kd = RGB255(84, 10, 134);
-  shared_ptr<Object> r14 ( new Pelota( Point(1.3, 0, 3.3), 1) );         r14->mt().kd = RGB255(206, 110, 34);
+  shared_ptr<Object> r14 ( new Pelota( Point(1.3, 0, 3.3), 1) );         r14->mt().kd = RGB255(206, 110, 34); r14->mt().ks = RGB(0.7);
 
   shared_ptr<Object> r15 ( new Pelota( Point(2, 2, 0.2), 1.2) );         r15->mt().kd = RGB255(107, 5, 2);
-  shared_ptr<Object> r16 ( new Pelota( Point(1.1, 3.8, -0.8), 1.2) );    r16->mt().kd = RGB255(201, 194, 167);
+  shared_ptr<Object> r16 ( new Pelota( Point(1.1, 3.8, -0.8), 1.2) );    r16->mt().kd = RGB255(201, 194, 167);  r16->mt().ks = RGB(0.7);
   shared_ptr<Object> r17 ( new Pelota( Point(1.6, 4, 1.2), 1.5) );       r17->mt().kd = RGB255(45, 153, 211);
 
   shared_ptr<Object> r18 ( new Pelota( Point(2.4, -2, -1.4), 1.2) );     r18->mt().kd = RGB255(27, 150, 42);
   shared_ptr<Object> r19 ( new Pelota( Point(3.1, 0, -0.8), 1.5) );      r19->mt().kd = RGB255(97, 135, 134);
-  shared_ptr<Object> r20 ( new Pelota( Point(2.8, -0.4, 1.8), 1.5) );    r20->mt().kd = RGB255(180, 27, 5)*2;
+  shared_ptr<Object> r20 ( new Pelota( Point(2.8, -0.4, 1.8), 1.5) );    r20->mt().kd = RGB255(180, 27, 5); r20->mt().ks = RGB(0.7);
   shared_ptr<Object> r21 ( new Pelota( Point(1.8, 0.5, 1), 0.8) );       r21->mt().kd = RGB255(45, 161, 203);
 
   shared_ptr<Object> r22 ( new Pelota( Point(3.2, -2.2, 1.2), 1.6) );    r22->mt().kd = RGB255(124, 9, 60);
   shared_ptr<Object> r23 ( new Pelota( Point(2.5, -3.6, -0.3), 1.2) );   r23->mt().kd = RGB255(45, 196, 33);
-  shared_ptr<Object> r24 ( new Pelota( Point(2, -4.4, 1.7), 1.3) );      r24->mt().kd = RGB255(45, 71, 36);
+  shared_ptr<Object> r24 ( new Pelota( Point(2, -4.4, 1.7), 1.3) );      r24->mt().kd = RGB255(45, 71, 36); r24->mt().ks = RGB(0.7);
   shared_ptr<Object> r25 ( new Pelota( Point(1.3, -5, -0.2), 1) );       r25->mt().kd = RGB255(59, 36, 42);
 
   scn2.addObj(r1); scn2.addObj(r2); scn2.addObj(r3); scn2.addObj(r4);
@@ -118,16 +118,18 @@ int main(){
   scn2.addObj(r18); scn2.addObj(r19); scn2.addObj(r20); scn2.addObj(r21);
   scn2.addObj(r22); scn2.addObj(r23); scn2.addObj(r24); scn2.addObj(r25);
 
-  shared_ptr<Object> r_up (new FinitePlane( Point(-2,6,0) , Direction(6,0,0), Direction(0,0,6) ));  r_up->mt().kd = RGB255(204, 74, 74);
+  shared_ptr<Object> r_up (new FinitePlane( Point(-2,6,0) , Direction(6,0,0), Direction(0,0,6) ));
   shared_ptr<Object> r_fr (new FinitePlane( Point(-5,6,0) , Direction(3,2,0), Direction(0,0,3) ));
-  r_up->mt().kd = RGB(0.5); r_up->emit = true; r_fr->mt().kd = RGB(1); r_fr->emit = true;
+  shared_ptr<Object> r_bh (new FinitePlane( Point(-15,0,0) , Direction(0,30,0), Direction(0,0,30) ));
+  r_up->mt().kd = RGB(5); r_up->emit = true;
+  r_fr->mt().kd = RGB(5); r_fr->emit = true;
+  r_bh->mt().kd = RGB(4); r_bh->emit = true;
 
-  scn2.addObj(r_up);
-  scn2.addObj(r_fr);
+  /*scn2.addObj(r_up); scn2.addObj(r_fr);*/ scn2.addObj(r_bh);
 
   t0 = clock();
   scn.PathTracing(800, 800, 80);
-  scn2.PathTracing(800, 800, 1);
+  scn2.PathTracing(800, 800, 80);
   t1 = clock();
   read_time = (double(t1-t0)/CLOCKS_PER_SEC);
   cout << "PT_1: " << read_time << " segundos" << endl;
@@ -137,7 +139,9 @@ int main(){
   Tone_Mapper tm1 = scn.getTonerImg();
   Tone_Mapper tm2 = scn2.getTonerImg();
   tm1.apply_tone_mapper(clamp_gamma, 255, 0.6);
-  tm2.apply_tone_mapper(clamp_gamma, 255, 0.6);
+  cout << tm2.getMax() << endl;
+  tm2.apply_tone_mapper(clamp_gamma, tm2.getMax()*6/8, 0.6);
+  cout << tm2.getMax() << endl;
   tm1.exportBMP("n1");
   tm2.exportBMP("n2");
   fusion(tm1.getImage(),tm2.getImage()).exportBitmap("neon");
