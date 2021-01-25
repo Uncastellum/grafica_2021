@@ -26,6 +26,7 @@ In no event shall copyright holders be liable for any damage.
 #include "Mesh.h"
 #include "BSDF.h"
 #include "Lambertian.h"
+#include "Phong.h"
 #include "Specular.h"
 #include "Transmissive.h"
 
@@ -51,10 +52,10 @@ int main(int argc, char* argv[])
 
 	unsigned int scene = 0;
 
-	unsigned int photons_global = 10000,
-				 photons_caustic = 10000,
+	unsigned int photons_global = 100000,
+				 photons_caustic = 100000,
 				 max_shots = 100000,
-				 nb_nearest_photons = 10,
+				 nb_nearest_photons = 50,
 				 m_it_progressive_pm = 5;
 
 	// ---------------------------------------------------------------------
@@ -102,6 +103,9 @@ int main(int argc, char* argv[])
 	BSDF* red = new Lambertian(w, Vector3(.85,.085,.085));
 	BSDF* green = new Lambertian(w, Vector3(.085,.85,.085));
 	BSDF* orange = new Lambertian(w, Vector3(.85,.6,.02));
+	BSDF* purple = new Lambertian(w, Vector3(.085,.085,.85));
+
+	BSDF* plastic_purple = new Phong(w, Vector3(.085,.085,.85),1.5);
 
 	Triangle* floor1 = new Triangle( Vector3(-1.5,0,1.5),Vector3(1.5,0.,1.5),
 									 Vector3(-1.5,0.,-1.5), white);
@@ -178,6 +182,26 @@ int main(int argc, char* argv[])
 		w->add_object(sphere1);
 		Object3D* sphere2 = new Sphere(Vector3(0,0.8,0), 0.3, orange);
 		w->add_object(sphere2);
+	}
+	break;
+	case 5:
+	{
+		Object3D* sphere1 = new Sphere(Vector3(-0.5,0.5,-0.5), 0.5, plastic_purple);
+		w->add_object(sphere1);
+		Object3D* sphere2 = new Sphere(Vector3(-0.7,1.7,-0.2), 0.3, plastic_purple);
+		w->add_object(sphere2);
+		Object3D* sphere3 = new Sphere(Vector3(0.7,1.7,-0.2), 0.3, purple);
+		w->add_object(sphere3);
+		Object3D* sphere4 = new Sphere(Vector3(0.5,0.5,-0.5), 0.5, purple);
+		w->add_object(sphere4);
+		Object3D* sphere5 = new Sphere(Vector3(0.3,0.2,0.9), 0.2, purple);
+		w->add_object(sphere5);
+		Object3D* sphere6 = new Sphere(Vector3(-0.3,0.2,0.9), 0.2, plastic_purple);
+		w->add_object(sphere6);
+		Object3D* sphere7 = new Sphere(Vector3(-0.1,1.3,-0.5), 0.2, plastic_purple);
+		w->add_object(sphere7);
+		Object3D* sphere8 = new Sphere(Vector3(0.1,1.3,-0.5), 0.2, purple);
+		w->add_object(sphere8);
 	}
 	break;
 	default:
