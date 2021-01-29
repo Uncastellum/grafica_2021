@@ -118,34 +118,10 @@ public:
     return Tone_Mapper(out_img);
   }
 
-  void RayTracing1rppx(int x, int y){
-   out_img = Image(x,y);
-   Direction aux_l = c.l * (1.0/(x/2));
-   Direction aux_u = c.u * (1.0/(x/2));
-   #pragma omp parallel for schedule(guided,1)
-   for (int i = 0; i < y; i++) {
-     #pragma omp parallel for schedule(guided,1)
-     for (int j = 0; j < x; j++) {
-       Direction ray = (c.origen + c.f + (aux_l * ((x/2)-(j+1))) + aux_l*0.5 + (aux_u * ((y/2)-(i+1))) + aux_u*0.5 ) - c.origen;
-       ray = ray.normalize();
-       //paint(ray);
-       float min_choque_dist, choque_dist, t; Direction n;
-       int choques=0;
-       RGB color;
-       for (int k = 0; k < objs.size(); k++) {
-         if(objs[k]->intersection(Ray(c.origen, ray), t, choque_dist, n)){ //comprobamos interseccion
-           choques++;
-           if(choques==1||choque_dist<min_choque_dist){ //comprobamos distancia
-             min_choque_dist = choque_dist;
-             color = objs[k]->mt().kd;
-           }
-         }
-       }
-       if (choques == 0) color = RGB(0,0,0);
-       out_img(j,i) = color;
-     }
-   }
-  }
+  // bye bye RayTracing1rppx
+  // Direction aux_l = c.l * (1.0/(x/2));
+  // Direction aux_u = c.u * (1.0/(x/2));
+  // Direction ray = (c.origen + c.f + (aux_l * ((x/2)-(j+1))) + aux_l*0.5 + (aux_u * ((y/2)-(i+1))) + aux_u*0.5 ) - c.origen;
 
   void RayTracing(const int x, const int y, const int rppx){
     out_img = Image(x,y);
@@ -160,15 +136,15 @@ public:
         for(int nray = 0; nray < rppx; nray++){
 
           Ray ray = c.getRandomRaypp(x,y,i,j);
-          float dist_obj = -1, d = 0, t;
-          Direction n;
+          float dist_obj = -1;
+          Intersection it;
           RGB color = RGB255(64,64,64);
 
           for (int k = 0; k < objs.size(); k++) {
-            if( objs[k]->intersection(ray, t, d, n) ){ //comprobamos interseccion
-              if (dist_obj == -1 || dist_obj > d) {
-                dist_obj = d;
-                color = objs[k]->mt().kd;
+            if( objs[k]->intersects(ray, it) ){ //comprobamos interseccion
+              if (dist_obj == -1 || dist_obj > it.dist) {
+                dist_obj = it.dist;
+                color = it.ob->mt().kd;
               }
             }
           }
@@ -196,9 +172,9 @@ public:
       bool contribute = true;
 
       for (int j = 0; j < objs.size() && contribute; j++) {
-        float t, z; Direction zz;
-        if( objs[j]->intersection(r_aux, t, z, zz) ){
-          if(t <= mod) contribute = false;
+        Intersection it;
+        if( objs[j]->intersects(r_aux, it) ){
+          if(it.t <= mod) contribute = false;
         }
       }
 
@@ -214,18 +190,19 @@ public:
 
     while(true){
 
-      float dist_obj = std::numeric_limits<float>::infinity(), d, t;
-      Direction n, n0;
-      shared_ptr<Object> intersects(nullptr);
+      float dist_obj = std::numeric_limits<float>::infinity();
+      Direction n;
+      Intersection it;
+      Object* intersects = nullptr;
 
       // 1. Rayo incide en objs?
       for (int k = 0; k < objs.size(); k++) {
         // 2. interseccion debe devolver punto y normal
-        if( objs[k]->intersection(luz_refl, t, d, n0) ){
-          if (dist_obj > d) {
-            n = n0;
-            dist_obj = d;
-            intersects = objs[k]; //cambiar por obtener funcion BRDF
+        if( objs[k]->intersects(luz_refl, it) ){
+          if (dist_obj > it.dist) {
+            n = it.n;
+            dist_obj = it.dist;
+            intersects = it.ob; //objs[k]; //cambiar por obtener funcion BRDF
           }
         }
       }

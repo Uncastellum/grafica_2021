@@ -38,6 +38,7 @@ struct Ray {
       float modulus() const { return mod; }
   } dir;
   Ray(){}
+  Direction dir_() const {return (Direction) dir;}
   Ray(Point o, Direction d) { orig = o; dir = d;}
   void setdirnorm(Direction d) { // d DEBE ESTAR NORMALIZADO
     dir.d_norm = d;
@@ -114,13 +115,15 @@ struct material {
   material(){}
 };
 
+struct Intersection;
+
 class Object{
 protected:
   Object(){};
   material mtl;
 public:
   bool emit = false;
-  virtual bool intersection(const Ray& r, float &t, float &dist, Direction& n) = 0;
+  virtual bool intersects(const Ray& r, Intersection& it) = 0;
   virtual void transform(const Matrix &m) = 0;
 
   virtual material& mt(){
@@ -131,6 +134,12 @@ public:
   }
 
   virtual void doItSpecial() {}
+};
+
+struct Intersection {
+  float t, dist;
+  Direction n;
+  Object *ob;
 };
 
 class LightPoint{

@@ -18,7 +18,8 @@ int main(){
   unsigned t0, t1;
   double read_time;
 
-  Camera c(Point(-3, 0, 0), Direction(0,0,1), Direction(0,1,0), Direction(0.85,0,0));
+  //Camera c(Point(-3, 0, 0), Direction(0,0,1), Direction(0,1,0), Direction(0.85,0,0));
+  Camera c(Point(-14, 0, 0), 140, true);
 
   Scene scn(c);
   shared_ptr<Object> pared_fr ( new Plane(Point(5,0,0), Direction(1,0,0)) );    pared_fr->mt().kd = RGB255(255, 20, 20);
@@ -40,6 +41,7 @@ int main(){
 
   shared_ptr<Object> ico ( new PLYObject("../objects/icosahedron.ply") );
   //ico->doItSpecial();
+  /*
   ico->transform(Matrix(rotate,y_axis,20));
   ico->transform(Matrix(rotate,z_axis,30));
   ico->transform(Matrix(scale,30,30,30));
@@ -64,16 +66,8 @@ int main(){
   scn.addObj(fp);
   */
 
-  /*
   t0 = clock();
-  scn.RayTracing1rppx(800, 800);
-  t1 = clock();
-  read_time = (double(t1-t0)/CLOCKS_PER_SEC);
-  cout << "RT1rppx_v1: " << read_time << " segundos" << endl;
-
-  */
-  t0 = clock();
-  scn.RayTracing(800, 800, 1);
+  scn.RayTracing(800, 800, 50);
   t1 = clock();
   read_time = (double(t1-t0)/CLOCKS_PER_SEC);
   cout << "RT: " << read_time << " segundos" << endl;

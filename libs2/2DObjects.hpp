@@ -18,17 +18,20 @@ public:
   Plane(Point dist, Direction norm) : p(dist), normal(norm.normalize()) {}
 
   // https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-plane-and-ray-disk-intersection
-  bool intersection(const Ray& r, float &t, float &dist, Direction& n) override {
+  bool intersects(const Ray& r, Intersection& it) override {
+    Intersection it0;
     float denom = dotProduct(normal, r.dir);
     if (fabs(denom) > 1e-6 ) {
       Direction p_orig = p - r.orig;
-      t = dotProduct(p_orig, normal) / denom;
-      dist = t*r.dir.modulus();
+      it0.t = dotProduct(p_orig, normal) / denom;
+      it0.dist = it0.t*r.dir.modulus();
       //PATCH  n = normal;
-      if(denom < 0) n = normal;
-      else n = neg(normal);
+      if(denom < 0) it0.n = normal;
+      else it0.n = neg(normal);
       //n = n.normalize(); si normal esta normalizada, la negada tmbn
-      return (t >= 0);
+      it0.ob = this;
+      it = it0;
+      return (it.t >= 0);
     }
     return false;
   }
@@ -53,9 +56,10 @@ public:
       v1mod = v1.modulus(); v2mod = v2.modulus();
     }
 
-  bool intersection(const Ray& r, float &t, float &dist, Direction& n) override {
-    if(Plane::intersection(r,t,dist,n)){
-      Point inter = r.orig + r.dir*t;
+  bool intersects(const Ray& r, Intersection& it) override {
+    if(Plane::intersects(r, it)){
+      it.ob = this;
+      Point inter = r.orig + r.dir*it.t;
       Direction auxv1 = inter - p;
       Direction auxv2 = auxv1;
 
@@ -103,13 +107,12 @@ public:
     normal = crossProduct(aux1, aux2).normalize();
   }
   // https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/ray-triangle-intersection-geometric-solution
-  bool intersection(const Ray& r, float &t, float &dist, Direction& n) override {
-    n = normal;
+  bool intersects(const Ray& r, Intersection& it) override {
+    Intersection it0;
     float denom = dotProduct(normal, r.dir);
 
-
-    if(denom < 0){ n = normal;}
-    else{ n = neg(normal);}
+    if(denom < 0){ it0.n = normal;}
+    else{ it0.n = neg(normal);}
     //n = n.normalize(); si normal esta normalizada, la negada tmbn
 
     if (fabs(denom) < 1e-6 ) {// triangle paralelo a rayo
@@ -117,12 +120,12 @@ public:
     }
 
     float d = dotProduct(normal, (a-r.orig));
-    t = (dotProduct(normal, Direction(0,0,0)) + d) / denom;
-    if (t < 0) return false; // triangle detras de camara
-    dist = t*r.dir.modulus();
+    it0.t = (dotProduct(normal, Direction(0,0,0)) + d) / denom;
+    if (it0.t < 0) return false; // triangle detras de camara
+    it0.dist = it0.t*r.dir.modulus();
 
     // Punto de interseccion
-    Point P = r.orig + (r.dir * t);
+    Point P = r.orig + (r.dir * it0.t);
 
     // Test dentro-fuera triangle
     Direction C;
@@ -145,6 +148,8 @@ public:
     C = crossProduct(edge2,vp2);
     if (dotProduct(normal,C) < 0) return false; // P is on the right side;
 
+    it0.ob = this;
+    it = it0;
     return true; // this ray hits the triangle
   }
   void transform(const Matrix &m) override {

@@ -11,7 +11,7 @@ private:
 public:
   Pelota(Point cen, float rad) : center(cen), radius(rad) {}
   // https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/ray-triangle-intersection-geometric-solution
-  bool intersection(const Ray& r, float &t, float &dist, Direction& n) override {
+  bool intersects(const Ray& r, Intersection& it) override {
     float t0, t1; // solutions for t if the ray intersects
     // analytic solution
     Direction aux = r.orig - center;
@@ -28,11 +28,14 @@ public:
       if (t0 < 0) return false; // both t0 and t1 are negative
     }
 
-    t = t0;
-    dist = t*r.dir.modulus();
+    Intersection it0;
+    it0.t = t0;
+    it0.dist = it0.t*r.dir.modulus();
     //n = ((r.orig + r.dir*t) - center).normalize();
-    n = (r.orig + r.dir*t) - center;
-    n = n.normalize();
+    it0.n = (r.orig + r.dir*it0.t) - center;
+    it0.n = it0.n.normalize();
+    it0.ob = this;
+    it = it0;
 
     return true;
   }

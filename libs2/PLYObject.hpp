@@ -27,6 +27,38 @@ private:
   Point center;
   vector<Triangle> obj;
   Triangle *marked;
+  struct AABB_points {
+    float minX, maxX, minY, maxY, minZ, maxZ;
+  } aabb;
+  void updateAABB(Point p) {
+    if(p[xi] < aabb.minX) aabb.minX = p[xi];
+    if(p[xi] > aabb.maxX) aabb.maxX = p[xi];
+    if(p[yj] < aabb.minY) aabb.minY = p[yj];
+    if(p[yj] > aabb.maxY) aabb.maxY = p[yj];
+    if(p[zk] < aabb.minZ) aabb.minZ = p[zk];
+    if(p[zk] > aabb.maxZ) aabb.maxZ = p[zk];
+  }
+  float _max(float a, float b) {if (a>b) return a; return b;}
+  float _min(float a, float b) {if (a>b) return b; return a;}
+  bool AABB_intersects(const Ray& ray) {
+    Direction dir = ray.dir_();
+    float t1 = (aabb.minX - ray.orig[xi]) / dir[xi];
+    float t2 = (aabb.maxX - ray.orig[xi]) / dir[xi];
+    float t3 = (aabb.minY - ray.orig[yj]) / dir[yj];
+    float t4 = (aabb.maxY - ray.orig[yj]) / dir[yj];
+    float t5 = (aabb.minZ - ray.orig[zk]) / dir[zk];
+    float t6 = (aabb.maxZ - ray.orig[zk]) / dir[zk];
+
+    float tmin = _max(_max(_min(t1, t2), _min(t3, t4)), _min(t5, t6));
+    float tmax = _min(_min(_max(t1, t2), _max(t3, t4)), _max(t5, t6));
+
+    // if tmax < 0, ray (line) is intersecting AABB, but whole AABB is behing us
+    // if tmin > tmax, ray doesn't intersect AABB
+    if (tmax < 0 || tmin > tmax) return false;
+    //if (tmin < 0f) return tmax;
+    //return tmin;
+    return true;
+  }
 
 public:
   PLYObject(string file){
@@ -73,7 +105,7 @@ public:
     paint(p); cout << endl;
     center = p;
 
-    for (size_t aa = 0; aa < points.size(); aa++) points[aa] -= center;
+    for (size_t aa = 0; aa < points.size(); aa++) {points[aa] -= center; updateAABB(points[aa]);}
 
     for (size_t i = 0; i < faces; i++) {
       int len;
@@ -108,31 +140,26 @@ public:
     f.close();
   }
 
-  bool intersection(const Ray& r, float &t, float &dist, Direction& n) override {
-    float d = 0, t0 = 0; dist = -1, t = -1;
-    //solid_color = RGB255(64,64,64);
+  bool intersects(const Ray& r, Intersection& it) override {
     Matrix localsys(Direction(1,0,0), Direction(0,1,0), Direction(0,0,1), center);
-    Ray external; Direction n1;
+    Ray external;
     external.orig = localsys*r.orig;
-    //external.dir = (localsys*r.dir).normalize();
     external.dir = localsys*r.dir;
+    if(!AABB_intersects(external)) return false;
+    it.dist = -1;
 
     for (int k = 0; k < obj.size(); k++) {
-      if( obj[k].intersection(external, t0, d, n1) ){ //comprobamos interseccion
-        if (dist == -1 || dist > d) {
-          n = n1;
-          dist = d; t = t0;
-          marked = &obj[k];
+      Intersection it0;
+      if( obj[k].intersects(external, it0) ){ //comprobamos interseccion
+        if (it.dist == -1 || it.dist > it0.dist) {
+          it = it0;
           //solid_color = obj[k].getSolid();
         }
       }
     }
 
-    if(dist > 0) {
-      return true;
-    } else {
-      return false;
-    }
+    if(it.dist > 0) return true;
+    return false;
   }
   void transform(const Matrix &m) override {
     Matrix fix = m;

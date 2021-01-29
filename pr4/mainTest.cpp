@@ -41,6 +41,8 @@ int main(){
   shared_ptr<Object> pelota3 ( new Pelota( Point(3, 2, 1), 1) );    pelota3->mt().kd = RGB255(55, 55, 204);
   pelota1->mt().is_dielectric = true; pelota1->mt().kd = 0; pelota1->mt().ks = 0; pelota1->mt().kt = 0.9;
   pelota2->mt().ks = RGB(0.35);
+  shared_ptr<Object> ico ( new PLYObject("../objects/icosahedron.ply") );
+  scn.addObj(ico);
 
   scn.addObj(pared_fr);
   scn.addObj(pared_iz);
