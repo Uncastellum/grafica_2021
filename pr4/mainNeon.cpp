@@ -128,8 +128,9 @@ int main(){
   /*scn2.addObj(r_up); scn2.addObj(r_fr);*/ scn2.addObj(r_bh);
 
   t0 = clock();
-  scn.PathTracing(800, 800, 80);
-  scn2.PathTracing(800, 800, 80);
+  scn.PathTracing(2500, 2500, 1000);
+  cout << "MITAD: " << double(clock()-t0)/CLOCKS_PER_SEC << " segundos" << endl;
+  scn2.PathTracing(2500, 2500, 1000);
   t1 = clock();
   read_time = (double(t1-t0)/CLOCKS_PER_SEC);
   cout << "PT_1: " << read_time << " segundos" << endl;
@@ -144,7 +145,7 @@ int main(){
   cout << tm2.getMax() << endl;
   tm1.exportBMP("n1");
   tm2.exportBMP("n2");
-  fusion(tm1.getImage(),tm2.getImage()).exportBitmap("neon");
+  fusion(tm1,tm2).exportBitmap("neon");
 
   t1 = clock();
   read_time = (double(t1-t0)/CLOCKS_PER_SEC);

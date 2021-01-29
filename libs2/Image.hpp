@@ -17,6 +17,7 @@ using namespace std;
 enum t_mapper { clamp, equalization, clamp_equaliz, gamma_curve, clamp_gamma };
 class Tone_Mapper; class Image;
 Image fusion(const Image& i1, const Image& i2);
+Image fusion(const Tone_Mapper& t1, const Tone_Mapper& t2);
 
 class Image {
 private:
@@ -267,6 +268,7 @@ Image fusion(const Image& i1, const Image& i2){
 class Tone_Mapper {
 private:
   Image i;
+  friend Image fusion(const Tone_Mapper& t1, const Tone_Mapper& t2);
 public:
   Tone_Mapper(Image i_) : i(i_){}
   Image getImage() {
@@ -329,3 +331,7 @@ public:
     }
   }
 };
+
+Image fusion(const Tone_Mapper& t1, const Tone_Mapper& t2){
+  return fusion(t1.i,t2.i);
+}
