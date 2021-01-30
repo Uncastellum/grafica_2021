@@ -73,8 +73,12 @@ int main(int argc, char *argv[]) {
     string mapper = "";
     float clamp = 1, gamma = 1, k = 1;
     if (choice == 1 || choice == 3 || choice == 5) {
-      cout << " [!] Enter Clamp Value: ";
-      cin >> clamp;
+      float aux = tm.getMax();
+      cout << " [!] Enter Clamp Value (float or *percentage) (max value=" << aux << "): ";
+      string cin_clamp;
+      cin >> cin_clamp;
+      if(cin_clamp[0] == '*') clamp = aux*atof(cin_clamp.erase(0,1).c_str());
+      else clamp = atof(cin_clamp.c_str());
       mapper += "-clmp" + ftm(clamp);
     }
     if (choice == 4 || choice == 5) {
