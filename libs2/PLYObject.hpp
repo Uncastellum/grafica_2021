@@ -170,6 +170,7 @@ public:
     for (size_t i = 0; i < obj.size(); i++) {
       Triangle t = obj[i];
       t.transform(fix);
+      updateAABB(t.get_a()); updateAABB(t.get_b()); updateAABB(t.get_c());
       obj[i] = t;
     }
   }

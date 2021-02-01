@@ -152,6 +152,9 @@ public:
     it = it0;
     return true; // this ray hits the triangle
   }
+  Point get_a() const {return a;} 
+  Point get_b() const {return b;}
+  Point get_c() const {return c;}
   void transform(const Matrix &m) override {
     // NOT PROTECTED!
     a = m*a;
