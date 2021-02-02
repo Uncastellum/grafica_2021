@@ -1,5 +1,8 @@
 # Informática Gráfica
 ---
+![Foto PathTracer](pt_balls.png)
+
+
 Trabajo relacionado con la asignatura de 4º del grado de Ingeniería Informática de [@Unizar](https://github.com/universidad-zaragoza)
 
 #### Creado por
@@ -20,7 +23,7 @@ Librerias relacionadas con la paralelización del código (OPENMP)
 | [libs](libs/) | Conjunto de librerias necesarias para el funcionamiento de los algoritmos |
 | [pr2-Mappers](pr2-Mappers/) | Implementación de un programa para el uso de los tone mappers |
 | [pr3-RayTracing](pr3-RayTracing/) | Ejercicio relacionado con la implementación de la práctica 3 |
-| [pr4-PathTracing](pr4-PathTracing/) | Implementación de un par de escenas con el uso del algoritmo PathTracing |
+| [pr4-PathTracer](pr4-PathTracer/) | Implementación de un par de escenas con el uso del algoritmo PathTracing |
 | [pr5-PhotonMapping](pr5-PhotonMapping/) | Algoritmo PhotonMapping (solo para Linux) |
 
 
@@ -39,7 +42,7 @@ using namespace std;
 
 Ejecutar ese comando desde una terminal en el directorio en el que se encuentre el archivo a compilar.
 
-! El proyecto PhotonMapping solo es compilable en Linux ->
+! El proyecto PhotonMapping solo es compilable en Linux -> ver [compilación](pr5-PhotonMapping/README.txt)
 
 
 ### Licencia
