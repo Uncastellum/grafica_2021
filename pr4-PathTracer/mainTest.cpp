@@ -10,7 +10,7 @@
 #include "PLYObject.hpp"
 #include "Scene.hpp"
 
-//g++ -std=c++11 -I ../libs2 mainTest.cpp -O3 -fopenmp -o main
+//g++ -std=c++11 -I ../libs mainTest.cpp -O3 -fopenmp -o main
 
 using namespace std;
 

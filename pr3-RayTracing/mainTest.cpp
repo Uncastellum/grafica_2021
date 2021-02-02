@@ -10,7 +10,7 @@
 #include "PLYObject.hpp"
 #include "Scene.hpp"
 
-//g++ -std=c++11 -I ../libs2 mainTest.cpp -O3 -fopenmp -o main
+//g++ -std=c++11 -I ../libs mainTest.cpp -O3 -fopenmp -o main
 
 using namespace std;
 
@@ -53,7 +53,7 @@ int main(){
   scn.addObj(pared_do);
   scn.addObj(pelota);
 
-  /*scn.addObj(pared_fr);
+  scn.addObj(pared_fr);
   scn.addObj(pared_iz);
   scn.addObj(pared_de);
   scn.addObj(pared_up);
@@ -64,7 +64,6 @@ int main(){
   scn.addObj(pelota22);
   scn.addObj(pelota3);
   scn.addObj(fp);
-  */
 
   t0 = clock();
   scn.RayTracing(800, 800, 50);

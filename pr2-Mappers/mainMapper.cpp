@@ -6,8 +6,7 @@
 
 #include "Image.hpp"
 
-//g++ -std=c++11 -I ../libs2 mainMapper.cpp -O3 -o mappers
-//g++ -std=c++11 -I ../libs2 mainTest.cpp -O3 -fopenmp -o render && g++ -std=c++11 -I ../libs2 mainMapper.cpp -O3 -o mappers && render && mappers
+//g++ -std=c++11 -I ../libs mainMapper.cpp -O3 -o mappers
 
 using namespace std;
 
